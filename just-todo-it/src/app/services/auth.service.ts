@@ -21,4 +21,12 @@ export class AuthService {
 	public register(email: string): Observable<User> {
 		return this.http.post<User>(`${this.authUrl}/register`, { email });
 	}
+
+	public activate(token: string, password: string): Observable<User> {
+		return this.http.post<User>(`${this.authUrl}/activate`, { token, password });
+	}
+
+	public resetPassword(token: string, password: string): Observable<User> {
+		return this.http.post<User>(`${this.authUrl}/reset-password`, { token, password });
+	}
 }

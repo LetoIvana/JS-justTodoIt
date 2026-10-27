@@ -5,6 +5,8 @@ const errorMessages: Record<string, string> = {
 	incorrect_email_or_password: 'Incorrect e-mail or password.',
 	user_with_same_email_exists: 'An account with this e-mail already exists.',
 	validation_error: 'Some of the entered data is invalid.',
+	activation_token_expired_or_invalid: 'This activation link is invalid or has expired.',
+	password_reset_token_expired_or_invalid: 'This password reset link is invalid or has expired.',
 };
 
 const fallbackMessage = 'Something went wrong. Please try again.';

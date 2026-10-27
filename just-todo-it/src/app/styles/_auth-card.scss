@@ -1,0 +1,16 @@
+// Shared content styles for the pages inside the card layout (account activation, password reset)
+
+.auth-card__title {
+	margin: 0 0 16px;
+	font: var(--mat-sys-headline-small);
+}
+
+.auth-card__error {
+	margin: 0 0 16px;
+	color: var(--mat-sys-error);
+}
+
+.auth-card__link {
+	color: inherit;
+	font: var(--mat-sys-title-small);
+}

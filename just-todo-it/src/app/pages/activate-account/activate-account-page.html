@@ -1,0 +1,15 @@
+<jti-card-layout>
+	<h1 class="auth-card__title">Activate account</h1>
+
+	@if (email(); as email) {
+		<jti-set-password-form
+			submitLabel="Activate account"
+			[email]="email"
+			[submitAction]="activate"
+			(succeeded)="onActivated()"
+		/>
+	} @else {
+		<p class="auth-card__error" role="alert">This activation link is invalid or has expired.</p>
+		<a class="auth-card__link" routerLink="/register">Register again</a>
+	}
+</jti-card-layout>
