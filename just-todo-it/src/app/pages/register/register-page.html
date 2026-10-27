@@ -1,0 +1,37 @@
+<jti-main-layout>
+	<section class="auth-page">
+		<h1 class="auth-page__title">Register</h1>
+
+		@if (registeredEmail(); as email) {
+			<p class="auth-page__description" role="status">
+				We sent an activation e-mail to <strong>{{ email }}</strong
+				>. Please check your inbox to activate your account.
+			</p>
+		} @else {
+			<p class="auth-page__description">
+				Please enter your e-mail for registration.<br />
+				We will send you activation e-mail.
+			</p>
+
+			<form class="auth-page__form" [formGroup]="form" (ngSubmit)="onSubmit()">
+				<mat-form-field>
+					<mat-label>E-mail</mat-label>
+					<input matInput type="email" formControlName="email" autocomplete="email" />
+					@if (form.controls.email.hasError('required')) {
+						<mat-error>E-mail is required.</mat-error>
+					} @else if (form.controls.email.hasError('email')) {
+						<mat-error>E-mail is not valid.</mat-error>
+					}
+				</mat-form-field>
+
+				@if (errorMessage(); as message) {
+					<p class="auth-page__error" role="alert">{{ message }}</p>
+				}
+
+				<button matButton="filled" type="submit" [disabled]="isSubmitting()">Register</button>
+			</form>
+		}
+
+		<p>Already have an account? <a class="auth-page__link" routerLink="/login">Log in</a></p>
+	</section>
+</jti-main-layout>

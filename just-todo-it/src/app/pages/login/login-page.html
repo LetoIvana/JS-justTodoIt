@@ -1,0 +1,49 @@
+<jti-main-layout>
+	<section class="auth-page">
+		<h1 class="auth-page__title">Login</h1>
+		<p class="auth-page__description">Please log in using your credentials.</p>
+
+		<form class="auth-page__form" [formGroup]="form" (ngSubmit)="onSubmit()">
+			<mat-form-field>
+				<mat-label>E-mail</mat-label>
+				<input matInput type="email" formControlName="email" autocomplete="email" />
+				@if (form.controls.email.hasError('required')) {
+					<mat-error>E-mail is required.</mat-error>
+				} @else if (form.controls.email.hasError('email')) {
+					<mat-error>E-mail is not valid.</mat-error>
+				}
+			</mat-form-field>
+
+			<mat-form-field>
+				<mat-label>Password</mat-label>
+				<input
+					matInput
+					formControlName="password"
+					autocomplete="current-password"
+					[type]="isPasswordVisible() ? 'text' : 'password'"
+				/>
+				<button
+					matIconButton
+					matSuffix
+					type="button"
+					[attr.aria-label]="isPasswordVisible() ? 'Hide password' : 'Show password'"
+					(click)="togglePasswordVisibility()"
+				>
+					<mat-icon>{{ isPasswordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
+				</button>
+				@if (form.controls.password.hasError('required')) {
+					<mat-error>Password is required.</mat-error>
+				}
+			</mat-form-field>
+
+			@if (errorMessage(); as message) {
+				<p class="auth-page__error" role="alert">{{ message }}</p>
+			}
+
+			<button matButton="filled" type="submit" [disabled]="isSubmitting()">Log in</button>
+		</form>
+
+		<a class="auth-page__link" routerLink="/forgot-password">Forgot password?</a>
+		<p>Do not have an account? <a class="auth-page__link" routerLink="/register">Register</a></p>
+	</section>
+</jti-main-layout>
