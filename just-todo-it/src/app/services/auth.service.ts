@@ -22,6 +22,10 @@ export class AuthService {
 		return this.http.post<User>(`${this.authUrl}/register`, { email });
 	}
 
+	public requestPasswordReset(email: string): Observable<void> {
+		return this.http.post<void>(`${this.authUrl}/request-password-reset`, { email });
+	}
+
 	public activate(token: string, password: string): Observable<User> {
 		return this.http.post<User>(`${this.authUrl}/activate`, { token, password });
 	}
