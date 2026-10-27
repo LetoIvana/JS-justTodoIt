@@ -18,7 +18,11 @@ export function getEmailFromToken(token: string | undefined): string | null {
 		const { email, exp } = jwtDecode<EmailTokenPayload>(token);
 		const isExpired = exp !== undefined && exp * 1000 <= Date.now();
 
-		return email && !isExpired ? email : null;
+		if (isExpired || !email) {
+			return null;
+		}
+
+		return email;
 	} catch {
 		return null;
 	}
