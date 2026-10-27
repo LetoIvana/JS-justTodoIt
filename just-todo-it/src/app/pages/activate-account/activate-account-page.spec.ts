@@ -51,13 +51,13 @@ describe('ActivateAccountPage', () => {
 		expect(element.querySelector<HTMLInputElement>('input[type="email"]')?.value).toBe('john@example.com');
 
 		element.querySelectorAll<HTMLInputElement>('input[autocomplete="new-password"]').forEach((input) => {
-			input.value = 'password1';
+			input.value = 'Password1!';
 			input.dispatchEvent(new Event('input'));
 		});
 		element.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
 
 		const request = httpTesting.expectOne(`${environment.apiUrl}/auth/activate`);
-		expect(request.request.body).toEqual({ token, password: 'password1' });
+		expect(request.request.body).toEqual({ token, password: 'Password1!' });
 		request.flush({ uuid: '1', email: 'john@example.com' });
 
 		expect(navigateSpy).toHaveBeenCalledWith(['/login']);

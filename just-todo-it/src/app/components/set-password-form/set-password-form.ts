@@ -1,4 +1,5 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
 	AbstractControl,
 	NonNullableFormBuilder,
@@ -15,6 +16,23 @@ import { finalize, Observable } from 'rxjs';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
 
 const minPasswordLength = 8;
+
+// Shown as a checklist under the password field, so every requirement is visible before the user starts typing
+const passwordRules = [
+	{
+		label: `At least ${minPasswordLength} characters`,
+		isMet: (password: string) => password.length >= minPasswordLength,
+	},
+	{ label: 'One uppercase letter', isMet: (password: string) => /\p{Lu}/u.test(password) },
+	{ label: 'One lowercase letter', isMet: (password: string) => /\p{Ll}/u.test(password) },
+	{ label: 'One number', isMet: (password: string) => /[0-9]/.test(password) },
+	// ASCII punctuation and symbols: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+	{ label: 'One special character', isMet: (password: string) => /[!-/:-@[-`{-~]/.test(password) },
+];
+
+function passwordRulesMet(control: AbstractControl<string>): ValidationErrors | null {
+	return passwordRules.every((rule) => rule.isMet(control.value)) ? null : { passwordRules: true };
+}
 
 function passwordsMatch(group: AbstractControl): ValidationErrors | null {
 	const { password, repeatPassword } = group.getRawValue();
@@ -55,12 +73,15 @@ export class SetPasswordForm {
 
 	protected readonly form = inject(NonNullableFormBuilder).group(
 		{
-			password: ['', [Validators.required, Validators.minLength(minPasswordLength)]],
+			password: ['', [Validators.required, passwordRulesMet]],
 			repeatPassword: ['', Validators.required],
 		},
 		{ validators: passwordsMatch }
 	);
-	protected readonly minPasswordLength = minPasswordLength;
+	private readonly password = toSignal(this.form.controls.password.valueChanges, { initialValue: '' });
+	protected readonly passwordRules = computed(() =>
+		passwordRules.map((rule) => ({ label: rule.label, isMet: rule.isMet(this.password()) }))
+	);
 	protected readonly repeatPasswordErrorStateMatcher = repeatPasswordErrorStateMatcher;
 	protected readonly isPasswordVisible = signal(false);
 	protected readonly isRepeatPasswordVisible = signal(false);

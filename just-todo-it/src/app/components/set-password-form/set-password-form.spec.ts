@@ -49,15 +49,42 @@ describe('SetPasswordForm', () => {
 		expect(submitAction).not.toHaveBeenCalled();
 	});
 
-	it('does not submit a password that is too short', () => {
-		fillAndSubmit('short', 'short');
+	it('lists every password requirement before anything is typed', () => {
+		const rules = [...element.querySelectorAll('.set-password-form__rule')].map((rule) => rule.textContent);
 
-		expect(element.textContent).toContain('Password must be at least 8 characters long.');
-		expect(submitAction).not.toHaveBeenCalled();
+		expect(rules).toEqual([
+			expect.stringContaining('At least 8 characters'),
+			expect.stringContaining('One uppercase letter'),
+			expect.stringContaining('One lowercase letter'),
+			expect.stringContaining('One number'),
+			expect.stringContaining('One special character'),
+		]);
+		expect(element.querySelector('.set-password-form__rule--met')).toBeNull();
 	});
 
+	it('ticks off requirements as the password is typed', () => {
+		const passwordInput = element.querySelector<HTMLInputElement>('input[autocomplete="new-password"]')!;
+
+		passwordInput.value = 'pass1';
+		passwordInput.dispatchEvent(new Event('input'));
+		fixture.detectChanges();
+
+		const metRules = [...element.querySelectorAll('.set-password-form__rule--met')].map((rule) => rule.textContent);
+		expect(metRules).toEqual([expect.stringContaining('One lowercase letter'), expect.stringContaining('One number')]);
+	});
+
+	it.each(['Pass1!', 'password1!', 'PASSWORD1!', 'Password!', 'Password²!', 'Password1', 'Password 1'])(
+		'does not submit %s',
+		(password) => {
+			fillAndSubmit(password, password);
+
+			expect(element.textContent).toContain('Password does not meet all requirements.');
+			expect(submitAction).not.toHaveBeenCalled();
+		}
+	);
+
 	it('does not submit when the passwords do not match', () => {
-		fillAndSubmit('password1', 'password2');
+		fillAndSubmit('Password1!', 'Password2!');
 
 		expect(element.textContent).toContain('Passwords do not match.');
 		expect(submitAction).not.toHaveBeenCalled();
@@ -67,9 +94,9 @@ describe('SetPasswordForm', () => {
 		const succeeded = vi.fn();
 		fixture.componentInstance.succeeded.subscribe(succeeded);
 
-		fillAndSubmit('password1', 'password1');
+		fillAndSubmit('Password1!', 'Password1!');
 
-		expect(submitAction).toHaveBeenCalledWith('password1');
+		expect(submitAction).toHaveBeenCalledWith('Password1!');
 		expect(succeeded).toHaveBeenCalled();
 	});
 
@@ -84,7 +111,7 @@ describe('SetPasswordForm', () => {
 			)
 		);
 
-		fillAndSubmit('password1', 'password1');
+		fillAndSubmit('Password1!', 'Password1!');
 
 		expect(element.querySelector('[role="alert"]')?.textContent).toContain(
 			'This activation link is invalid or has expired.'
