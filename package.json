@@ -29,6 +29,7 @@
 	},
 	"lint-staged": {
 		"*.{js,cjs,mjs,ts,json,html,css,scss}": "prettier --write",
-		"api/src/**/*.ts": "pnpm --dir api exec eslint --fix"
+		"api/src/**/*.ts": "pnpm --dir api exec eslint --fix",
+		"just-todo-it/src/**/*.{ts,html}": "pnpm --dir just-todo-it exec eslint --fix"
 	}
 }
