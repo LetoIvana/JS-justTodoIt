@@ -4,8 +4,7 @@
 
 		@if (registeredEmail(); as email) {
 			<p class="auth-page__description" role="status">
-				We sent an activation e-mail to <strong>{{ email }}</strong
-				>. Please check your inbox to activate your account.
+				Check the inbox of <strong>{{ email }}</strong> for the activation e-mail to activate your account.
 			</p>
 		} @else {
 			<p class="auth-page__description">
