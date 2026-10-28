@@ -53,4 +53,17 @@ describe('AuthService', () => {
 
 		expect(service.user()).toEqual(user);
 	});
+
+	it('clears the user after logging out', () => {
+		service.login({ email: user.email, password: 'secret' }).subscribe();
+		httpTesting.expectOne(`${environment.apiUrl}/auth/login`).flush(user);
+
+		service.logout().subscribe();
+
+		const request = httpTesting.expectOne(`${environment.apiUrl}/auth/logout`);
+		expect(request.request.method).toBe('POST');
+		request.flush(null, { status: 204, statusText: 'No Content' });
+
+		expect(service.user()).toBeNull();
+	});
 });
