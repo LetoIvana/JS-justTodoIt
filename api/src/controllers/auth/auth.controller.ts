@@ -1,19 +1,12 @@
 import { BodyParams, Controller, Get, Post, Req, Res, QueryParams } from '@tsed/common';
-import { Required, Email, Property, Enum, Returns, Summary, Description } from '@tsed/schema';
+import { Required, Email, Property, Enum, Returns, Summary, Description, MinLength, Pattern } from '@tsed/schema';
 import { Auth } from '../../decorators/auth.decorator';
 import { User } from '../../entities/user';
 import { ResponseErrorCode } from '../../enums/response-error-code.enum';
 import { clearSessionCookie, sanitizeUser, setSessionCookie } from '../../helpers';
 import { AuthService } from '../../services/auth/auth.service';
 import { UserService } from '../../services/user/user.service';
-import {
-	BadRequest,
-	Conflict,
-	Forbidden,
-	NotFound,
-	Unauthorized,
-	UnprocessableEntity,
-} from '@tsed/exceptions';
+import { BadRequest, Conflict, Forbidden, NotFound, Unauthorized, UnprocessableEntity } from '@tsed/exceptions';
 import { DemographicProfile } from '../../entities/demographic-profile';
 import { Gender } from '../../enums/gender.enum';
 import { NewsletterPreferences } from '../../entities/newsletter-preferences';
@@ -43,11 +36,21 @@ class LoginData {
 	password: string;
 }
 
+// Same rules as the frontend's set password form: at least one uppercase letter, lowercase letter, digit and
+// ASCII special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)
+// A string, not a RegExp: Ts.ED would put the slashes and flags into the schema. AJV compiles it with the `u` flag.
+const passwordPattern = '^(?=.*\\p{Lu})(?=.*\\p{Ll})(?=.*[0-9])(?=.*[!-/:-@[-`{-~])';
+
 class PasswordSettingData {
 	@Required()
 	token: string;
 
 	@Required()
+	@MinLength(8)
+	@Pattern(passwordPattern)
+	@Description(
+		'At least 8 characters, with at least one uppercase letter, lowercase letter, digit and special character'
+	)
 	password: string;
 }
 

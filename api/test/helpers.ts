@@ -113,8 +113,7 @@ function readUserToken(server: TestServer, email: string, column: 'activationTok
 
 	try {
 		const row = db.prepare(`SELECT ${column} FROM user WHERE email = ?`).get(email) as
-			| Record<string, string | null>
-			| undefined;
+			Record<string, string | null> | undefined;
 
 		if (!row?.[column]) {
 			throw new Error(`No ${column} found for ${email}`);
@@ -192,7 +191,7 @@ export function uniqueEmail(): string {
  */
 export async function createLoggedInUser(server: TestServer): Promise<TestUser> {
 	const email = uniqueEmail();
-	const password = 'correct horse battery staple';
+	const password = 'Correct horse battery staple 1!';
 
 	const registerResponse = await postJson(server, '/auth/register', { email });
 	if (!registerResponse.ok) {

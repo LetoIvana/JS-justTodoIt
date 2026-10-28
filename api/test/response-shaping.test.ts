@@ -73,7 +73,7 @@ describe('response shaping', () => {
 		await postJson(server, '/auth/register', { email });
 		const token = readActivationToken(server, email);
 
-		await assertSanitizedUser(await postJson(server, '/auth/activate', { token, password: 'hunter22' }), email);
+		await assertSanitizedUser(await postJson(server, '/auth/activate', { token, password: 'Hunter22!' }), email);
 	});
 
 	test('login returns a sanitized user', async () => {
@@ -91,7 +91,7 @@ describe('response shaping', () => {
 		const token = readPasswordResetToken(server, email);
 
 		await assertSanitizedUser(
-			await postJson(server, '/auth/reset-password', { token, password: 'new password' }),
+			await postJson(server, '/auth/reset-password', { token, password: 'New password 1!' }),
 			email
 		);
 	});
@@ -117,11 +117,11 @@ describe('response shaping', () => {
 		['a valid token for an unknown user', tokenForUnknownUser()],
 	]) {
 		test(`activate with ${name} is a clean 4xx`, async () => {
-			await assertCleanClientError(await postJson(server, '/auth/activate', { token, password: 'hunter22' }));
+			await assertCleanClientError(await postJson(server, '/auth/activate', { token, password: 'Hunter22!' }));
 		});
 
 		test(`reset-password with ${name} is a clean 4xx`, async () => {
-			await assertCleanClientError(await postJson(server, '/auth/reset-password', { token, password: 'hunter22' }));
+			await assertCleanClientError(await postJson(server, '/auth/reset-password', { token, password: 'Hunter22!' }));
 		});
 	}
 });
