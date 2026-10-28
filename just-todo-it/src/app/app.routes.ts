@@ -3,8 +3,13 @@ import { loggedInGuard } from './guards/logged-in.guard';
 import { loggedOutGuard } from './guards/logged-out.guard';
 
 export const routes: Routes = [
-	// Temporary empty page until the Todo list table (the real home page) exists
-	{ path: '', pathMatch: 'full', canActivate: [loggedInGuard], children: [] },
+	{
+		path: '',
+		pathMatch: 'full',
+		canActivate: [loggedInGuard],
+		title: 'Todo lists | Just Todo It',
+		loadComponent: () => import('./pages/todo-lists/todo-lists-page').then((m) => m.TodoListsPage),
+	},
 	{
 		path: 'login',
 		canActivate: [loggedOutGuard],

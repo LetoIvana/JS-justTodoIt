@@ -7,7 +7,20 @@
 
 		<span class="header__spacer"></span>
 
-		<a class="header__link" routerLink="/login" routerLinkActive="header__link--active">Log in</a>
-		<a class="header__link" routerLink="/register" routerLinkActive="header__link--active">Register</a>
+		@if (user(); as user) {
+			<div class="header__user">
+				<span class="header__email">{{ user.email }}</span>
+				<button mat-icon-button aria-label="Open user menu" [matMenuTriggerFor]="userMenu">
+					<mat-icon>menu</mat-icon>
+				</button>
+			</div>
+
+			<mat-menu #userMenu="matMenu" xPosition="before">
+				<button mat-menu-item (click)="onLogout()">Log out</button>
+			</mat-menu>
+		} @else {
+			<a class="header__link" routerLink="/login" routerLinkActive="header__link--active">Log in</a>
+			<a class="header__link" routerLink="/register" routerLinkActive="header__link--active">Register</a>
+		}
 	</nav>
 </mat-toolbar>
