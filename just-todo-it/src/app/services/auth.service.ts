@@ -42,7 +42,7 @@ export class AuthService {
 
 	// The session cookie is HTTP-only, so only the API can clear it
 	public logout(): Observable<void> {
-		return this.http.post<void>(`${this.authUrl}/logout`, null).pipe(tap(() => this.currentUser.set(null)));
+		return this.http.post<void>(`${this.authUrl}/logout`, null).pipe(tap(() => this.clearUser()));
 	}
 
 	public register(email: string): Observable<User> {

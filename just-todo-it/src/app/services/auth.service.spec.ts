@@ -66,4 +66,16 @@ describe('AuthService', () => {
 
 		expect(service.user()).toBeNull();
 	});
+
+	it('treats a 401 on logout as a lost session, logging the user out and sending them to the login page', () => {
+		const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+		service.login({ email: user.email, password: 'secret' }).subscribe();
+		httpTesting.expectOne(`${environment.apiUrl}/auth/login`).flush(user);
+
+		service.logout().subscribe({ error: () => undefined });
+		httpTesting.expectOne(`${environment.apiUrl}/auth/logout`).flush(null, { status: 401, statusText: 'Unauthorized' });
+
+		expect(service.user()).toBeNull();
+		expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+	});
 });
