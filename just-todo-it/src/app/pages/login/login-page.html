@@ -20,17 +20,9 @@
 					matInput
 					formControlName="password"
 					autocomplete="current-password"
-					[type]="isPasswordVisible() ? 'text' : 'password'"
+					[type]="passwordToggle.inputType()"
 				/>
-				<button
-					matIconButton
-					matSuffix
-					type="button"
-					[attr.aria-label]="isPasswordVisible() ? 'Hide password' : 'Show password'"
-					(click)="togglePasswordVisibility()"
-				>
-					<mat-icon>{{ isPasswordVisible() ? 'visibility_off' : 'visibility' }}</mat-icon>
-				</button>
+				<jti-password-visibility-toggle #passwordToggle matSuffix />
 				@if (form.controls.password.hasError('required')) {
 					<mat-error>Password is required.</mat-error>
 				}

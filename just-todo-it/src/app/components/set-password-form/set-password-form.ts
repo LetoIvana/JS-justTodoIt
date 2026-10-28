@@ -8,12 +8,13 @@ import {
 	Validators,
 } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 import { MatError, MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { finalize, Observable } from 'rxjs';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
+import { PasswordVisibilityToggle } from '../password-visibility-toggle/password-visibility-toggle';
 
 const minPasswordLength = 8;
 
@@ -55,10 +56,10 @@ const repeatPasswordErrorStateMatcher: ErrorStateMatcher = {
 		MatError,
 		MatFormField,
 		MatIcon,
-		MatIconButton,
 		MatInput,
 		MatLabel,
 		MatSuffix,
+		PasswordVisibilityToggle,
 		ReactiveFormsModule,
 	],
 	selector: 'jti-set-password-form',
@@ -83,8 +84,6 @@ export class SetPasswordForm {
 		passwordRules.map((rule) => ({ label: rule.label, isMet: rule.isMet(this.password()) }))
 	);
 	protected readonly repeatPasswordErrorStateMatcher = repeatPasswordErrorStateMatcher;
-	protected readonly isPasswordVisible = signal(false);
-	protected readonly isRepeatPasswordVisible = signal(false);
 	protected readonly isSubmitting = signal(false);
 	protected readonly errorMessage = signal<string | null>(null);
 

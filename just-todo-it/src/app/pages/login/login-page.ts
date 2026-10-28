@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButton } from '@angular/material/button';
 import { MatError, MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { MainLayout } from '../../components/main-layout/main-layout';
+import { PasswordVisibilityToggle } from '../../components/password-visibility-toggle/password-visibility-toggle';
 import { AuthService } from '../../services/auth.service';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
 
@@ -16,11 +16,10 @@ import { getApiErrorMessage } from '../../utils/get-api-error-message';
 		MatButton,
 		MatError,
 		MatFormField,
-		MatIcon,
-		MatIconButton,
 		MatInput,
 		MatLabel,
 		MatSuffix,
+		PasswordVisibilityToggle,
 		ReactiveFormsModule,
 		RouterLink,
 	],
@@ -36,13 +35,8 @@ export class LoginPage {
 		email: ['', [Validators.required, Validators.email]],
 		password: ['', Validators.required],
 	});
-	protected readonly isPasswordVisible = signal(false);
 	protected readonly isSubmitting = signal(false);
 	protected readonly errorMessage = signal<string | null>(null);
-
-	protected togglePasswordVisibility(): void {
-		this.isPasswordVisible.update((isVisible) => !isVisible);
-	}
 
 	protected onSubmit(): void {
 		if (this.form.invalid) {
