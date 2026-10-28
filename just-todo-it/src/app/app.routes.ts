@@ -25,11 +25,13 @@ export const routes: Routes = [
 	},
 	{
 		path: 'activate-account',
+		canActivate: [loggedOutGuard],
 		title: 'Activate account | Just Todo It',
 		loadComponent: () => import('./pages/activate-account/activate-account-page').then((m) => m.ActivateAccountPage),
 	},
 	{
 		path: 'reset-password',
+		canActivate: [loggedOutGuard],
 		title: 'Reset password | Just Todo It',
 		loadComponent: () => import('./pages/reset-password/reset-password-page').then((m) => m.ResetPasswordPage),
 	},
