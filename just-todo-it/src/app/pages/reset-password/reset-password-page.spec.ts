@@ -43,7 +43,7 @@ describe('ResetPasswordPage', () => {
 		expect(element.querySelector('form')).toBeNull();
 	});
 
-	it('resets the password with the token and new password, then goes to login', async () => {
+	it('resets the password with the token and new password, then logs in', async () => {
 		const token = createValidTestToken('john@example.com');
 		const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 		await render(token);
@@ -60,6 +60,30 @@ describe('ResetPasswordPage', () => {
 		expect(request.request.body).toEqual({ token, password: 'Password1!' });
 		request.flush({ uuid: '1', email: 'john@example.com' });
 
+		const loginRequest = httpTesting.expectOne(`${environment.apiUrl}/auth/login`);
+		expect(loginRequest.request.body).toEqual({ email: 'john@example.com', password: 'Password1!' });
+		loginRequest.flush({ uuid: '1', email: 'john@example.com' });
+
+		expect(navigateSpy).toHaveBeenCalledWith(['/']);
+	});
+
+	it('resets the password but goes to login if logging in fails', async () => {
+		const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+		await render(createValidTestToken('john@example.com'));
+
+		element.querySelectorAll<HTMLInputElement>('input[autocomplete="new-password"]').forEach((input) => {
+			input.value = 'Password1!';
+			input.dispatchEvent(new Event('input'));
+		});
+		element.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+
+		httpTesting.expectOne(`${environment.apiUrl}/auth/reset-password`).flush({ uuid: '1', email: 'john@example.com' });
+		httpTesting
+			.expectOne(`${environment.apiUrl}/auth/login`)
+			.flush(null, { status: 500, statusText: 'Internal Server Error' });
+		await fixture.whenStable();
+
 		expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+		expect(element.querySelector('[role="alert"]')).toBeNull();
 	});
 });

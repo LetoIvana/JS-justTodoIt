@@ -1,6 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
+import { catchError, EMPTY, switchMap } from 'rxjs';
 import { CardLayout } from '../../components/card-layout/card-layout';
 import { SetPasswordForm } from '../../components/set-password-form/set-password-form';
 import { AuthService } from '../../services/auth.service';
@@ -21,10 +22,22 @@ export class ActivateAccountPage {
 	public readonly token = input<string>();
 
 	protected readonly email = computed(() => getEmailFromToken(this.token()));
-	protected readonly activate = (password: string) => this.authService.activate(this.token() ?? '', password);
+	protected readonly activate = (password: string) =>
+		this.authService.activate(this.token() ?? '', password).pipe(
+			switchMap(({ email }) =>
+				this.authService.login({ email, password }).pipe(
+					// The token is used up by now, so retrying from the form would only report an invalid link
+					catchError(() => {
+						this.snackBar.open('Your account is activated. Please log in.', 'Close');
+						this.router.navigate(['/login']);
+						return EMPTY;
+					})
+				)
+			)
+		);
 
 	protected onActivated(): void {
-		this.snackBar.open('Your account is activated. You can now log in.', 'Close');
-		this.router.navigate(['/login']);
+		this.snackBar.open('Your account is activated.', 'Close');
+		this.router.navigate(['/']);
 	}
 }
