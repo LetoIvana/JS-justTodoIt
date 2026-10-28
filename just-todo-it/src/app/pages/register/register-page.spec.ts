@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { RegisterPage } from './register-page';
 
@@ -40,7 +40,8 @@ describe('RegisterPage', () => {
 		httpTesting.expectNone(`${environment.apiUrl}/auth/register`);
 	});
 
-	it('registers with the e-mail only and tells the user to check their inbox', () => {
+	it('registers with the e-mail only, tells the user to check their inbox and goes to login', () => {
+		const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 		fillAndSubmit('john@example.com');
 
 		const request = httpTesting.expectOne(`${environment.apiUrl}/auth/register`);
@@ -48,8 +49,10 @@ describe('RegisterPage', () => {
 		request.flush({ uuid: '1', email: 'john@example.com' });
 		fixture.detectChanges();
 
-		expect(element.querySelector('[role="status"]')?.textContent).toContain('john@example.com');
-		expect(element.querySelector('form')).toBeNull();
+		expect(document.querySelector('mat-snack-bar-container')?.textContent).toContain(
+			'We have sent an activation link to john@example.com.'
+		);
+		expect(navigateSpy).toHaveBeenCalledWith(['/login']);
 	});
 
 	it('shows a readable message when the e-mail is already taken', () => {

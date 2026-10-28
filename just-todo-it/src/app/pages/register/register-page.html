@@ -2,34 +2,28 @@
 	<section class="auth-page">
 		<h1 class="auth-page__title">Register</h1>
 
-		@if (registeredEmail(); as email) {
-			<p class="auth-page__description" role="status">
-				Check the inbox of <strong>{{ email }}</strong> for the activation e-mail to activate your account.
-			</p>
-		} @else {
-			<p class="auth-page__description">
-				Please enter your e-mail for registration.<br />
-				We will send you activation e-mail.
-			</p>
+		<p class="auth-page__description">
+			Please enter your e-mail for registration.<br />
+			We will send you activation e-mail.
+		</p>
 
-			<form class="auth-page__form" [formGroup]="form" (ngSubmit)="onSubmit()">
-				<mat-form-field>
-					<mat-label>E-mail</mat-label>
-					<input matInput type="email" formControlName="email" autocomplete="email" />
-					@if (form.controls.email.hasError('required')) {
-						<mat-error>E-mail is required.</mat-error>
-					} @else if (form.controls.email.hasError('email')) {
-						<mat-error>E-mail is not valid.</mat-error>
-					}
-				</mat-form-field>
-
-				@if (errorMessage(); as message) {
-					<p class="auth-page__error" role="alert">{{ message }}</p>
+		<form class="auth-page__form" [formGroup]="form" (ngSubmit)="onSubmit()">
+			<mat-form-field>
+				<mat-label>E-mail</mat-label>
+				<input matInput type="email" formControlName="email" autocomplete="email" />
+				@if (form.controls.email.hasError('required')) {
+					<mat-error>E-mail is required.</mat-error>
+				} @else if (form.controls.email.hasError('email')) {
+					<mat-error>E-mail is not valid.</mat-error>
 				}
+			</mat-form-field>
 
-				<button matButton="filled" type="submit" [disabled]="isSubmitting()">Register</button>
-			</form>
-		}
+			@if (errorMessage(); as message) {
+				<p class="auth-page__error" role="alert">{{ message }}</p>
+			}
+
+			<button matButton="filled" type="submit" [disabled]="isSubmitting()">Register</button>
+		</form>
 
 		<p>Already have an account? <a class="auth-page__link" routerLink="/login">Log in</a></p>
 	</section>
