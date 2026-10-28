@@ -38,7 +38,7 @@ describe('auth', () => {
 		assert.ok(getCookie(loginResponse, 'token'), 'login sets a token cookie');
 	});
 
-	describe('activate and reset-password reject a password that breaks the rules', () => {
+	describe('register, activate and reset-password reject a password that breaks the rules', () => {
 		const weakPasswords = [
 			['is shorter than 8 characters', 'Abc12!'],
 			['has no uppercase letter', 'password1!'],
@@ -48,6 +48,12 @@ describe('auth', () => {
 		];
 
 		for (const [rule, password] of weakPasswords) {
+			test(`register rejects a password that ${rule}`, async () => {
+				const response = await postJson(server, '/auth/register', { email: uniqueEmail(), password });
+				assert.equal(response.status, 400);
+				assert.equal(((await response.json()) as { code: string }).code, 'validation_error');
+			});
+
 			test(`activate rejects a password that ${rule}`, async () => {
 				const email = uniqueEmail();
 				await postJson(server, '/auth/register', { email });

@@ -65,7 +65,7 @@ describe('response shaping', () => {
 	test('register with a password returns a sanitized user', async () => {
 		const email = uniqueEmail();
 
-		await assertSanitizedUser(await postJson(server, '/auth/register', { email, password: 'hunter22' }), email);
+		await assertSanitizedUser(await postJson(server, '/auth/register', { email, password: 'Hunter22!' }), email);
 	});
 
 	test('activate returns a sanitized user', async () => {
@@ -78,7 +78,7 @@ describe('response shaping', () => {
 
 	test('login returns a sanitized user', async () => {
 		const email = uniqueEmail();
-		const password = 'hunter22';
+		const password = 'Hunter22!';
 		await postJson(server, '/auth/register', { email, password });
 
 		await assertSanitizedUser(await postJson(server, '/auth/login', { email, password }), email);

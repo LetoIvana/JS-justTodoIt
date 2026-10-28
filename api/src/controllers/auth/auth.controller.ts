@@ -1,4 +1,5 @@
 import { BodyParams, Controller, Get, Post, Req, Res, QueryParams } from '@tsed/common';
+import { useDecorators } from '@tsed/core';
 import { Required, Email, Property, Enum, Returns, Summary, Description, MinLength, Pattern } from '@tsed/schema';
 import { Auth } from '../../decorators/auth.decorator';
 import { User } from '../../entities/user';
@@ -11,13 +12,28 @@ import { DemographicProfile } from '../../entities/demographic-profile';
 import { Gender } from '../../enums/gender.enum';
 import { NewsletterPreferences } from '../../entities/newsletter-preferences';
 
+// Same rules as the frontend's set password form: at least one uppercase letter, lowercase letter, digit and
+// ASCII special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)
+// A string, not a RegExp: Ts.ED would put the slashes and flags into the schema. AJV compiles it with the `u` flag.
+const passwordPattern = '^(?=.*\\p{Lu})(?=.*\\p{Ll})(?=.*[0-9])(?=.*[!-/:-@[-`{-~])';
+
+const passwordRulesDescription =
+	'At least 8 characters, with at least one uppercase letter, lowercase letter, digit and special character';
+
+function PasswordRules(): PropertyDecorator {
+	return useDecorators(MinLength(8), Pattern(passwordPattern));
+}
+
 class RegisterData {
 	@Required()
 	@Email()
 	email: string;
 
 	@Property()
-	@Description('User will automatically be activated if password is set during registration')
+	@PasswordRules()
+	@Description(
+		`User will automatically be activated if password is set during registration. ${passwordRulesDescription}`
+	)
 	password: string;
 }
 
@@ -36,21 +52,13 @@ class LoginData {
 	password: string;
 }
 
-// Same rules as the frontend's set password form: at least one uppercase letter, lowercase letter, digit and
-// ASCII special character (!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~)
-// A string, not a RegExp: Ts.ED would put the slashes and flags into the schema. AJV compiles it with the `u` flag.
-const passwordPattern = '^(?=.*\\p{Lu})(?=.*\\p{Ll})(?=.*[0-9])(?=.*[!-/:-@[-`{-~])';
-
 class PasswordSettingData {
 	@Required()
 	token: string;
 
 	@Required()
-	@MinLength(8)
-	@Pattern(passwordPattern)
-	@Description(
-		'At least 8 characters, with at least one uppercase letter, lowercase letter, digit and special character'
-	)
+	@PasswordRules()
+	@Description(passwordRulesDescription)
 	password: string;
 }
 
