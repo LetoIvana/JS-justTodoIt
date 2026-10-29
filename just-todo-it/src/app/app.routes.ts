@@ -35,4 +35,5 @@ export const routes: Routes = [
 		title: 'Reset password | Just Todo It',
 		loadComponent: () => import('./pages/reset-password/reset-password-page').then((m) => m.ResetPasswordPage),
 	},
+	{ path: '**', redirectTo: '' },
 ];
