@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { Header } from '../header/header';
 
 /**
- * Wrapper for pages that show the app header. The page content is projected below it.
+ * Wrapper for pages that show the app header. The routed page is rendered below it.
  */
 @Component({
-	imports: [Header],
+	imports: [Header, RouterOutlet],
 	selector: 'jti-main-layout',
 	styleUrl: './main-layout.scss',
 	templateUrl: './main-layout.html',

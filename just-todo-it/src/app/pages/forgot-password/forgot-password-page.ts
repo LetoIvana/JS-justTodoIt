@@ -5,12 +5,11 @@ import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { MainLayout } from '../../components/main-layout/main-layout';
 import { AuthService } from '../../services/auth.service';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
 
 @Component({
-	imports: [MainLayout, MatButton, MatError, MatFormField, MatInput, MatLabel, ReactiveFormsModule, RouterLink],
+	imports: [MatButton, MatError, MatFormField, MatInput, MatLabel, ReactiveFormsModule, RouterLink],
 	selector: 'jti-forgot-password-page',
 	styleUrl: './forgot-password-page.scss',
 	templateUrl: './forgot-password-page.html',
