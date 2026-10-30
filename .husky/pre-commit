@@ -1,0 +1,2 @@
+pnpm --dir just-todo-it typecheck && pnpm exec lint-staged --concurrent false 
+

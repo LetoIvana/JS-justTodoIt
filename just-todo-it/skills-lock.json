@@ -1,0 +1,11 @@
+{
+	"version": 1,
+	"skills": {
+		"pr-review-code-simplicity": {
+			"source": "infinum/ai",
+			"sourceType": "github",
+			"skillPath": "plugins/pr-review-code-simplicity/skills/pr-review-code-simplicity/SKILL.md",
+			"computedHash": "cc227ac0d0f9dbaa59e3ba5dd2982b8c059022e9488556e8bca615fda994aee6"
+		}
+	}
+}

@@ -18,5 +18,18 @@
 			"onFail": "warn"
 		}
 	},
-	"packageManager": "pnpm@11.18.0"
+	"packageManager": "pnpm@11.18.0",
+	"scripts": {
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"husky": "9.1.7",
+		"lint-staged": "17.6.0",
+		"prettier": "3.9.10"
+	},
+	"lint-staged": {
+		"*.{js,cjs,mjs,ts,json,html,css,scss}": "prettier --write",
+		"api/src/**/*.ts": "pnpm --dir api exec eslint --fix",
+		"just-todo-it/src/**/*.{ts,html}": "pnpm --dir just-todo-it exec eslint --fix"
+	}
 }
