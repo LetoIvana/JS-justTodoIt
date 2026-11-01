@@ -1,0 +1,48 @@
+// Shared layout for the auth pages (login, register, ...): a narrow, centred column
+
+.auth-page {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	max-width: 300px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.auth-page__title {
+	margin: 8px 0;
+	font: var(--mat-sys-headline-small);
+}
+
+.auth-page__description {
+	margin: 0 0 16px;
+	font: var(--mat-sys-body-large);
+}
+
+.auth-page__form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+
+	mat-form-field {
+		width: 100%;
+	}
+}
+
+.auth-page__error {
+	margin: 0;
+	color: var(--mat-sys-error);
+}
+
+.auth-page__link {
+	color: inherit;
+	font: var(--mat-sys-title-small);
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
