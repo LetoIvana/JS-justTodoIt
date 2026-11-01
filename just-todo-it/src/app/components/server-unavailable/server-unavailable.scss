@@ -1,0 +1,27 @@
+@use 'auth-card';
+
+// Same centred card as the card layout, which cannot be reused here because it renders a router outlet
+:host {
+	display: block;
+	height: 100%;
+}
+
+.server-unavailable {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	min-height: 100%;
+	padding: 16px;
+	background-color: var(--mat-sys-primary);
+}
+
+.server-unavailable__card {
+	width: 100%;
+	max-width: 400px;
+}
+
+.server-unavailable__description {
+	margin: 0 0 16px;
+	font: var(--mat-sys-body-large);
+}

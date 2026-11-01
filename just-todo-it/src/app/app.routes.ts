@@ -5,7 +5,16 @@ import { loggedInGuard } from './guards/logged-in.guard';
 import { loggedOutGuard } from './guards/logged-out.guard';
 
 export const routes: Routes = [
-	// The deliberate exception to the protected group below
+	// Protected by default: every page added here needs a session
+	{
+		path: '',
+		canActivate: [loggedInGuard],
+		children: [
+			// Temporary empty page until the Todo list table (the real home page) exists
+			{ path: '', pathMatch: 'full', children: [] },
+		],
+	},
+	// The deliberate exception to the protected group above
 	{
 		path: '',
 		canActivate: [loggedOutGuard],
@@ -49,15 +58,6 @@ export const routes: Routes = [
 					},
 				],
 			},
-		],
-	},
-	// Protected by default: every page added here needs a session
-	{
-		path: '',
-		canActivate: [loggedInGuard],
-		children: [
-			// Temporary empty page until the Todo list table (the real home page) exists
-			{ path: '', pathMatch: 'full', children: [] },
 		],
 	},
 	{ path: '**', redirectTo: '' },
