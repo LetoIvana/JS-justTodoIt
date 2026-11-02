@@ -137,16 +137,23 @@ describe('TodoListsTable', () => {
 		expect(element().textContent).toContain("You don't have any Todo lists yet.");
 	});
 
-	it('shows an error when loading fails, and clears it after the next successful load', async () => {
+	it('shows only an error when loading fails, and clears it after the next successful load', async () => {
 		await open();
+		flushList(expectListRequest(), createTodoLists(5), 7);
+		await stable();
 
+		await open('/?page=2');
 		expectListRequest().flush(null, { status: 500, statusText: 'Server Error' });
 		await stable();
 
 		const alert = () => element().querySelector('[role="alert"]');
 		expect(alert()?.textContent).toContain('Something went wrong. Please try again.');
+		// The first page's rows must not stay under a paginator that already says page 2
+		expect(element().querySelector('table')).toBeNull();
+		expect(element().querySelector('mat-paginator')).toBeNull();
+		expect(element().querySelector('mat-card')).toBeNull();
 
-		await open('/?page=2');
+		await open('/');
 		flushList(expectListRequest(), createTodoLists(5), 7);
 		await stable();
 

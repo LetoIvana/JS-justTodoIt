@@ -13,65 +13,68 @@
 	<p class="todo-lists-table__error" role="alert">{{ errorMessage }}</p>
 }
 
-<mat-card class="todo-lists-table__card">
-	<div class="todo-lists-table__progress">
-		@if (isLoading()) {
-			<mat-progress-bar mode="indeterminate" />
+<!-- After an error only the message is shown, instead of an empty card under it -->
+@if (!errorMessage() || isLoading()) {
+	<mat-card class="todo-lists-table__card">
+		<div class="todo-lists-table__progress">
+			@if (isLoading()) {
+				<mat-progress-bar mode="indeterminate" />
+			}
+		</div>
+
+		@if (result(); as result) {
+			@if (result.totalCount === 0) {
+				<p class="todo-lists-table__empty">
+					@if (query().title) {
+						No Todo lists match "{{ query().title }}".
+					} @else {
+						You don't have any Todo lists yet.
+					}
+				</p>
+			} @else {
+				<table
+					mat-table
+					matSort
+					matSortDisableClear
+					[dataSource]="result.todoLists"
+					[matSortActive]="query().sortBy"
+					[matSortDirection]="query().sortDirection"
+					(matSortChange)="onSortChange($event)"
+				>
+					<ng-container matColumnDef="title">
+						<th *matHeaderCellDef mat-header-cell mat-sort-header>Title</th>
+						<td *matCellDef="let todoList" mat-cell>{{ todoList.title }}</td>
+					</ng-container>
+
+					<ng-container matColumnDef="created">
+						<th *matHeaderCellDef mat-header-cell mat-sort-header>Date created</th>
+						<td *matCellDef="let todoList" mat-cell>{{ todoList.created | date: 'short' }}</td>
+					</ng-container>
+
+					<ng-container matColumnDef="actions">
+						<th *matHeaderCellDef mat-header-cell class="todo-lists-table__actions">Actions</th>
+						<td *matCellDef="let todoList" mat-cell class="todo-lists-table__actions">
+							<a matButton [attr.aria-label]="'Details of ' + todoList.title" [routerLink]="['/', todoList.uuid]">
+								Details
+							</a>
+							<button matIconButton [attr.aria-label]="'Delete ' + todoList.title" (click)="onDelete(todoList)">
+								<mat-icon>close</mat-icon>
+							</button>
+						</td>
+					</ng-container>
+
+					<tr *matHeaderRowDef="columns" mat-header-row></tr>
+					<tr *matRowDef="let row; columns: columns" mat-row></tr>
+				</table>
+
+				<!-- With a single page size the paginator shows it as plain text instead of a select -->
+				<mat-paginator
+					[length]="result.totalCount"
+					[pageIndex]="query().page - 1"
+					[pageSize]="pageSize"
+					(page)="onPageChange($event)"
+				/>
+			}
 		}
-	</div>
-
-	@if (result(); as result) {
-		@if (result.totalCount === 0) {
-			<p class="todo-lists-table__empty">
-				@if (query().title) {
-					No Todo lists match "{{ query().title }}".
-				} @else {
-					You don't have any Todo lists yet.
-				}
-			</p>
-		} @else {
-			<table
-				mat-table
-				matSort
-				matSortDisableClear
-				[dataSource]="result.todoLists"
-				[matSortActive]="query().sortBy"
-				[matSortDirection]="query().sortDirection"
-				(matSortChange)="onSortChange($event)"
-			>
-				<ng-container matColumnDef="title">
-					<th *matHeaderCellDef mat-header-cell mat-sort-header>Title</th>
-					<td *matCellDef="let todoList" mat-cell>{{ todoList.title }}</td>
-				</ng-container>
-
-				<ng-container matColumnDef="created">
-					<th *matHeaderCellDef mat-header-cell mat-sort-header>Date created</th>
-					<td *matCellDef="let todoList" mat-cell>{{ todoList.created | date: 'short' }}</td>
-				</ng-container>
-
-				<ng-container matColumnDef="actions">
-					<th *matHeaderCellDef mat-header-cell class="todo-lists-table__actions">Actions</th>
-					<td *matCellDef="let todoList" mat-cell class="todo-lists-table__actions">
-						<a matButton [attr.aria-label]="'Details of ' + todoList.title" [routerLink]="['/', todoList.uuid]">
-							Details
-						</a>
-						<button matIconButton [attr.aria-label]="'Delete ' + todoList.title" (click)="onDelete(todoList)">
-							<mat-icon>close</mat-icon>
-						</button>
-					</td>
-				</ng-container>
-
-				<tr *matHeaderRowDef="columns" mat-header-row></tr>
-				<tr *matRowDef="let row; columns: columns" mat-row></tr>
-			</table>
-
-			<!-- With a single page size the paginator shows it as plain text instead of a select -->
-			<mat-paginator
-				[length]="result.totalCount"
-				[pageIndex]="query().page - 1"
-				[pageSize]="pageSize"
-				(page)="onPageChange($event)"
-			/>
-		}
-	}
-</mat-card>
+	</mat-card>
+}

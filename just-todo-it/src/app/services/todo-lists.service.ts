@@ -4,8 +4,11 @@ import { map, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { TodoList } from '../models/todo-list';
 
-export type TodoListSortBy = 'title' | 'created';
-export type TodoListSortDirection = 'asc' | 'desc';
+export const todoListSortByValues = ['title', 'created'] as const;
+export const todoListSortDirectionValues = ['asc', 'desc'] as const;
+
+export type TodoListSortBy = (typeof todoListSortByValues)[number];
+export type TodoListSortDirection = (typeof todoListSortDirectionValues)[number];
 
 export interface TodoListsQuery {
 	page: number;

@@ -31,11 +31,11 @@ import {
 	combineLatest,
 	debounceTime,
 	distinctUntilChanged,
-	EMPTY,
 	filter,
 	finalize,
 	map,
 	Observable,
+	of,
 	startWith,
 	Subject,
 	switchMap,
@@ -46,7 +46,9 @@ import {
 	PagedTodoLists,
 	TODO_LISTS_PAGE_SIZE,
 	TodoListSortBy,
+	todoListSortByValues,
 	TodoListSortDirection,
+	todoListSortDirectionValues,
 	TodoListsQuery,
 	TodoListsService,
 } from '../../services/todo-lists.service';
@@ -54,8 +56,6 @@ import { getApiErrorMessage } from '../../utils/get-api-error-message';
 import { ConfirmDialog, ConfirmDialogData } from '../confirm-dialog/confirm-dialog';
 
 const FILTER_DEBOUNCE_MS = 300;
-const sortByValues: TodoListSortBy[] = ['title', 'created'];
-const sortDirectionValues: TodoListSortDirection[] = ['asc', 'desc'];
 const defaultQuery: TodoListsQuery = { page: 1, sortBy: 'created', sortDirection: 'desc', title: '' };
 
 // Anything missing or invalid in the URL falls back to the default, so a hand-edited URL still shows a usable table
@@ -66,8 +66,8 @@ function parseQuery(params: ParamMap): TodoListsQuery {
 
 	return {
 		page: Number.isInteger(page) && page > 0 ? page : defaultQuery.page,
-		sortBy: sortByValues.includes(sortBy) ? sortBy : defaultQuery.sortBy,
-		sortDirection: sortDirectionValues.includes(sortDirection) ? sortDirection : defaultQuery.sortDirection,
+		sortBy: todoListSortByValues.includes(sortBy) ? sortBy : defaultQuery.sortBy,
+		sortDirection: todoListSortDirectionValues.includes(sortDirection) ? sortDirection : defaultQuery.sortDirection,
 		title: params.get('title')?.trim() ?? defaultQuery.title,
 	};
 }
@@ -210,7 +210,7 @@ export class TodoListsTable {
 	}
 
 	// Errors are shown in the template and never complete `result`, so a later query can still load
-	private loadPage(query: TodoListsQuery): Observable<PagedTodoLists> {
+	private loadPage(query: TodoListsQuery): Observable<PagedTodoLists | null> {
 		this.isLoading.set(true);
 
 		return this.todoListsService.getAll(query).pipe(
@@ -227,7 +227,8 @@ export class TodoListsTable {
 			}),
 			catchError((error: unknown) => {
 				this.errorMessage.set(getApiErrorMessage(error));
-				return EMPTY;
+				// The previous rows would no longer match the sort and page shown above them
+				return of(null);
 			}),
 			finalize(() => this.isLoading.set(false))
 		);
