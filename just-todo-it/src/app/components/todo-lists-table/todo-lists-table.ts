@@ -35,6 +35,7 @@ import {
 	filter,
 	finalize,
 	map,
+	Observable,
 	startWith,
 	Subject,
 	switchMap,
@@ -42,6 +43,7 @@ import {
 } from 'rxjs';
 import { TodoList } from '../../models/todo-list';
 import {
+	PagedTodoLists,
 	TODO_LISTS_PAGE_SIZE,
 	TodoListSortBy,
 	TodoListSortDirection,
@@ -148,28 +150,7 @@ export class TodoListsTable {
 	protected readonly result = toSignal(
 		combineLatest([this.query$, this.refresh$.pipe(startWith(undefined))]).pipe(
 			// switchMap cancels the previous request, so a slow response for an older query can never overwrite a newer one
-			switchMap(([query]) => {
-				this.isLoading.set(true);
-
-				return this.todoListsService.getAll(query).pipe(
-					tap(() => this.errorMessage.set(null)),
-					// Past the last page (e.g. its last row was deleted, or a hand-edited URL), redirect to it
-					// and drop this response, since the redirect loads the right one
-					filter(({ totalCount }) => {
-						const lastPage = getLastPage(totalCount);
-						if (query.page > lastPage) {
-							this.navigate({ page: lastPage }, true);
-						}
-
-						return query.page <= lastPage;
-					}),
-					catchError((error: unknown) => {
-						this.errorMessage.set(getApiErrorMessage(error));
-						return EMPTY;
-					}),
-					finalize(() => this.isLoading.set(false))
-				);
-			})
+			switchMap(([query]) => this.loadPage(query))
 		)
 	);
 
@@ -182,7 +163,7 @@ export class TodoListsTable {
 				filter((title) => title !== this.query().title),
 				takeUntilDestroyed()
 			)
-			// replaceUrl: one history entry per search, not per pause while typing
+			// replaceUrl: searches don't add history entries, so Back leaves the page instead of stepping through each search
 			.subscribe((title) => this.navigate({ title, page: 1 }, true));
 
 		// Back/forward navigation changes the filter without the user typing
@@ -226,6 +207,30 @@ export class TodoListsTable {
 				},
 				error: (error: unknown) => this.snackBar.open(getApiErrorMessage(error), 'Close'),
 			});
+	}
+
+	// Errors are shown in the template and never complete `result`, so a later query can still load
+	private loadPage(query: TodoListsQuery): Observable<PagedTodoLists> {
+		this.isLoading.set(true);
+
+		return this.todoListsService.getAll(query).pipe(
+			tap(() => this.errorMessage.set(null)),
+			// Past the last page (e.g. its last row was deleted, or a hand-edited URL), redirect to it
+			// and drop this response, since the redirect loads the right one
+			filter(({ totalCount }) => {
+				const lastPage = getLastPage(totalCount);
+				if (query.page > lastPage) {
+					this.navigate({ page: lastPage }, true);
+				}
+
+				return query.page <= lastPage;
+			}),
+			catchError((error: unknown) => {
+				this.errorMessage.set(getApiErrorMessage(error));
+				return EMPTY;
+			}),
+			finalize(() => this.isLoading.set(false))
+		);
 	}
 
 	private navigate(changes: Partial<TodoListsQuery>, replaceUrl = false): void {

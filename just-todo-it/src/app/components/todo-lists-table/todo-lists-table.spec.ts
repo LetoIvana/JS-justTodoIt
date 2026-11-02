@@ -56,10 +56,19 @@ describe('TodoListsTable', () => {
 		await harness.fixture.whenStable();
 	}
 
+	function filterInput(): HTMLInputElement {
+		return element().querySelector<HTMLInputElement>('input[type="search"]')!;
+	}
+
 	function typeFilter(value: string): void {
-		const input = element().querySelector<HTMLInputElement>('input[type="search"]')!;
+		const input = filterInput();
 		input.value = value;
 		input.dispatchEvent(new Event('input'));
+	}
+
+	// The snack bar is rendered in an overlay outside the table
+	function snackBarText(): string | undefined {
+		return document.querySelector('mat-snack-bar-container')?.textContent;
 	}
 
 	async function stable(): Promise<void> {
@@ -155,7 +164,7 @@ describe('TodoListsTable', () => {
 			sortDirection: 'ASC',
 			title: 'shop',
 		});
-		expect(element().querySelector<HTMLInputElement>('input[type="search"]')!.value).toBe('shop');
+		expect(filterInput().value).toBe('shop');
 		expect(element().querySelector('mat-expansion-panel')?.classList).toContain('mat-expanded');
 	});
 
@@ -241,7 +250,7 @@ describe('TodoListsTable', () => {
 		vi.useFakeTimers();
 		await vi.advanceTimersByTimeAsync(300);
 
-		expect(element().querySelector<HTMLInputElement>('input[type="search"]')!.value).toBe('');
+		expect(filterInput().value).toBe('');
 		// Updating the input must not start a search of its own
 		httpTesting.expectNone(todoListsUrl);
 		expect(TestBed.inject(Router).url).toBe('/');
@@ -338,7 +347,7 @@ describe('TodoListsTable', () => {
 			httpTesting.expectOne({ method: 'DELETE', url: `${todoListsUrl}/1` }).flush(null);
 			await stable();
 
-			expect(document.querySelector('mat-snack-bar-container')?.textContent).toContain('"List 1" has been deleted.');
+			expect(snackBarText()).toContain('"List 1" has been deleted.');
 
 			flushList(expectListRequest(), createTodoLists(2).slice(1));
 			await stable();
@@ -357,9 +366,7 @@ describe('TodoListsTable', () => {
 				.flush(null, { status: 500, statusText: 'Server Error' });
 			await stable();
 
-			expect(document.querySelector('mat-snack-bar-container')?.textContent).toContain(
-				'Something went wrong. Please try again.'
-			);
+			expect(snackBarText()).toContain('Something went wrong. Please try again.');
 			httpTesting.expectNone(todoListsUrl);
 			expect(rowTitles()).toEqual(['List 1', 'List 2']);
 		});
