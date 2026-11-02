@@ -42,9 +42,9 @@ import {
 } from 'rxjs';
 import { TodoList } from '../../models/todo-list';
 import {
-	SortDirection,
 	TODO_LISTS_PAGE_SIZE,
 	TodoListSortBy,
+	TodoListSortDirection,
 	TodoListsQuery,
 	TodoListsService,
 } from '../../services/todo-lists.service';
@@ -53,14 +53,14 @@ import { ConfirmDialog, ConfirmDialogData } from '../confirm-dialog/confirm-dial
 
 const FILTER_DEBOUNCE_MS = 300;
 const sortByValues: TodoListSortBy[] = ['title', 'created'];
-const sortDirectionValues: SortDirection[] = ['asc', 'desc'];
+const sortDirectionValues: TodoListSortDirection[] = ['asc', 'desc'];
 const defaultQuery: TodoListsQuery = { page: 1, sortBy: 'created', sortDirection: 'desc', title: '' };
 
 // Anything missing or invalid in the URL falls back to the default, so a hand-edited URL still shows a usable table
 function parseQuery(params: ParamMap): TodoListsQuery {
 	const page = Number(params.get('page'));
 	const sortBy = params.get('sortBy') as TodoListSortBy;
-	const sortDirection = params.get('sortDirection') as SortDirection;
+	const sortDirection = params.get('sortDirection') as TodoListSortDirection;
 
 	return {
 		page: Number.isInteger(page) && page > 0 ? page : defaultQuery.page,
@@ -68,6 +68,11 @@ function parseQuery(params: ParamMap): TodoListsQuery {
 		sortDirection: sortDirectionValues.includes(sortDirection) ? sortDirection : defaultQuery.sortDirection,
 		title: params.get('title')?.trim() ?? defaultQuery.title,
 	};
+}
+
+function getLastPage(totalCount: number): number {
+	// An empty result still has a first page to show the empty state on
+	return Math.max(Math.ceil(totalCount / TODO_LISTS_PAGE_SIZE), 1);
 }
 
 function isSameQuery(a: TodoListsQuery, b: TodoListsQuery): boolean {
@@ -148,15 +153,15 @@ export class TodoListsTable {
 
 				return this.todoListsService.getAll(query).pipe(
 					tap(() => this.errorMessage.set(null)),
-					// e.g. the last row of the last page was deleted, or the URL points past the end
+					// Past the last page (e.g. its last row was deleted, or a hand-edited URL), redirect to it
+					// and drop this response, since the redirect loads the right one
 					filter(({ totalCount }) => {
-						const lastPage = Math.max(Math.ceil(totalCount / TODO_LISTS_PAGE_SIZE), 1);
-						if (query.page <= lastPage) {
-							return true;
+						const lastPage = getLastPage(totalCount);
+						if (query.page > lastPage) {
+							this.navigate({ page: lastPage }, true);
 						}
 
-						this.navigate({ page: lastPage }, true);
-						return false;
+						return query.page <= lastPage;
 					}),
 					catchError((error: unknown) => {
 						this.errorMessage.set(getApiErrorMessage(error));
@@ -192,7 +197,7 @@ export class TodoListsTable {
 	}
 
 	protected onSortChange({ active, direction }: Sort): void {
-		this.navigate({ sortBy: active as TodoListSortBy, sortDirection: direction as SortDirection, page: 1 });
+		this.navigate({ sortBy: active as TodoListSortBy, sortDirection: direction as TodoListSortDirection, page: 1 });
 	}
 
 	protected onPageChange({ pageIndex }: PageEvent): void {
@@ -215,7 +220,10 @@ export class TodoListsTable {
 				switchMap(() => this.todoListsService.delete(todoList.uuid))
 			)
 			.subscribe({
-				next: () => this.refresh$.next(),
+				next: () => {
+					this.snackBar.open(`"${todoList.title}" has been deleted.`, 'Close');
+					this.refresh$.next();
+				},
 				error: (error: unknown) => this.snackBar.open(getApiErrorMessage(error), 'Close'),
 			});
 	}

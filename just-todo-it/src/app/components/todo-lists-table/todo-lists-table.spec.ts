@@ -128,6 +128,23 @@ describe('TodoListsTable', () => {
 		expect(element().textContent).toContain("You don't have any Todo lists yet.");
 	});
 
+	it('shows an error when loading fails, and clears it after the next successful load', async () => {
+		await open();
+
+		expectListRequest().flush(null, { status: 500, statusText: 'Server Error' });
+		await stable();
+
+		const alert = () => element().querySelector('[role="alert"]');
+		expect(alert()?.textContent).toContain('Something went wrong. Please try again.');
+
+		await open('/?page=2');
+		flushList(expectListRequest(), createTodoLists(5), 7);
+		await stable();
+
+		expect(alert()).toBeNull();
+		expect(rowTitles()).toHaveLength(5);
+	});
+
 	it('restores the page, sort and filter from the URL', async () => {
 		await open('/?page=2&sortBy=title&sortDirection=asc&title=shop');
 
@@ -214,6 +231,22 @@ describe('TodoListsTable', () => {
 		flushList(request, createTodoLists(5), 12);
 	});
 
+	it('updates the filter input when the URL changes without typing, e.g. on back navigation', async () => {
+		await open('/?title=shop');
+		flushList(expectListRequest(), []);
+		await stable();
+
+		await open('/');
+		flushList(expectListRequest(), createTodoLists(1));
+		vi.useFakeTimers();
+		await vi.advanceTimersByTimeAsync(300);
+
+		expect(element().querySelector<HTMLInputElement>('input[type="search"]')!.value).toBe('');
+		// Updating the input must not start a search of its own
+		httpTesting.expectNone(todoListsUrl);
+		expect(TestBed.inject(Router).url).toBe('/');
+	});
+
 	describe('filtering', () => {
 		beforeEach(async () => {
 			await open('/?page=2');
@@ -294,7 +327,7 @@ describe('TodoListsTable', () => {
 			await stable();
 		});
 
-		it('asks for confirmation, then deletes and reloads the table', async () => {
+		it('asks for confirmation, then deletes, confirms the deletion and reloads the table', async () => {
 			await clickDelete('List 1');
 
 			expect(document.querySelector('mat-dialog-content')?.textContent).toContain('"List 1"');
@@ -305,10 +338,30 @@ describe('TodoListsTable', () => {
 			httpTesting.expectOne({ method: 'DELETE', url: `${todoListsUrl}/1` }).flush(null);
 			await stable();
 
+			expect(document.querySelector('mat-snack-bar-container')?.textContent).toContain('"List 1" has been deleted.');
+
 			flushList(expectListRequest(), createTodoLists(2).slice(1));
 			await stable();
 
 			expect(rowTitles()).toEqual(['List 2']);
+		});
+
+		it('shows an error and keeps the table when deleting fails', async () => {
+			await clickDelete('List 1');
+
+			dialogButton('Delete').click();
+			await stable();
+
+			httpTesting
+				.expectOne({ method: 'DELETE', url: `${todoListsUrl}/1` })
+				.flush(null, { status: 500, statusText: 'Server Error' });
+			await stable();
+
+			expect(document.querySelector('mat-snack-bar-container')?.textContent).toContain(
+				'Something went wrong. Please try again.'
+			);
+			httpTesting.expectNone(todoListsUrl);
+			expect(rowTitles()).toEqual(['List 1', 'List 2']);
 		});
 
 		it('leaves everything unchanged when cancelled', async () => {

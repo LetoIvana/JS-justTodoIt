@@ -5,12 +5,12 @@ import { environment } from '../../environments/environment';
 import { TodoList } from '../models/todo-list';
 
 export type TodoListSortBy = 'title' | 'created';
-export type SortDirection = 'asc' | 'desc';
+export type TodoListSortDirection = 'asc' | 'desc';
 
 export interface TodoListsQuery {
 	page: number;
 	sortBy: TodoListSortBy;
-	sortDirection: SortDirection;
+	sortDirection: TodoListSortDirection;
 	title: string;
 }
 
