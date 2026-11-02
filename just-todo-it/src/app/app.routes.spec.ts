@@ -38,6 +38,23 @@ describe('routes', () => {
 		expect(TestBed.inject(Router).url).toBe('/todo-lists');
 	});
 
+	it("opens a Todo list's details page for a logged-in user", async () => {
+		user.set({ uuid: '1', email: 'john@example.com' });
+
+		const harness = await RouterTestingHarness.create('/todo-lists/1');
+
+		expect(TestBed.inject(Router).url).toBe('/todo-lists/1');
+		expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('Todo list details');
+	});
+
+	it('sends a logged-out user from a Todo list details page to the login page', async () => {
+		user.set(null);
+
+		await RouterTestingHarness.create('/todo-lists/1');
+
+		expect(TestBed.inject(Router).url).toBe('/login');
+	});
+
 	it('sends a logged-in user from an unknown page to the todo lists page', async () => {
 		user.set({ uuid: '1', email: 'john@example.com' });
 

@@ -223,6 +223,22 @@ describe('TodoListsTable', () => {
 		expect(queryParams(expectListRequest())['pageNumber']).toBe('2');
 	});
 
+	it('replaces invalid values in the URL with the ones the table shows, without loading again', async () => {
+		await open('/?page=2&sortBy=title&sortDirection=rgdfs');
+		await stable();
+
+		expect(TestBed.inject(Router).url).toBe('/?page=2&sortBy=title');
+		expect(queryParams(expectListRequest())).toMatchObject({ pageNumber: '2', sortBy: 'title', sortDirection: 'DESC' });
+	});
+
+	it('removes params the table does not use from the URL', async () => {
+		await open('/?page=2&foo=bar');
+		await stable();
+
+		expect(TestBed.inject(Router).url).toBe('/?page=2');
+		expect(queryParams(expectListRequest())['pageNumber']).toBe('2');
+	});
+
 	it('sorts by name in both directions, starting from the first page', async () => {
 		await open('/?page=2');
 		flushList(expectListRequest(), createTodoLists(5), 12);

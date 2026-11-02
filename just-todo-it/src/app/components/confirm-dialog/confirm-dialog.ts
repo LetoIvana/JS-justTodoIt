@@ -15,7 +15,7 @@ export interface ConfirmDialogData {
 }
 
 /**
- * Closes with `true` when confirmed, and with nothing when cancelled or dismissed.
+ * Closes with `true` when confirmed, `false` when cancelled, and nothing when dismissed (Escape or backdrop click).
  */
 @Component({
 	imports: [MatButton, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle],

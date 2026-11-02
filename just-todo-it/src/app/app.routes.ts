@@ -18,6 +18,12 @@ export const routes: Routes = [
 				title: 'Todo lists | Just Todo It',
 				loadComponent: () => import('./pages/todo-lists/todo-lists-page').then((m) => m.TodoListsPage),
 			},
+			{
+				path: 'todo-lists/:uuid',
+				title: 'Todo list details | Just Todo It',
+				loadComponent: () =>
+					import('./pages/todo-list-details/todo-list-details-page').then((m) => m.TodoListDetailsPage),
+			},
 		],
 	},
 	// The deliberate exception to the protected group above

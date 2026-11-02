@@ -25,7 +25,7 @@ import {
 	MatRowDef,
 	MatTable,
 } from '@angular/material/table';
-import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
 	catchError,
 	combineLatest,
@@ -46,49 +46,19 @@ import {
 	PagedTodoLists,
 	TODO_LISTS_PAGE_SIZE,
 	TodoListSortBy,
-	todoListSortByValues,
 	TodoListSortDirection,
-	todoListSortDirectionValues,
 	TodoListsQuery,
 	TodoListsService,
 } from '../../services/todo-lists.service';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
 import { ConfirmDialog, ConfirmDialogData } from '../confirm-dialog/confirm-dialog';
+import { isCanonicalQuery, isSameQuery, parseQuery, toQueryParams } from './todo-lists-query';
 
 const FILTER_DEBOUNCE_MS = 300;
-const defaultQuery: TodoListsQuery = { page: 1, sortBy: 'created', sortDirection: 'desc', title: '' };
-
-// Anything missing or invalid in the URL falls back to the default, so a hand-edited URL still shows a usable table
-function parseQuery(params: ParamMap): TodoListsQuery {
-	const page = Number(params.get('page'));
-	const sortBy = params.get('sortBy') as TodoListSortBy;
-	const sortDirection = params.get('sortDirection') as TodoListSortDirection;
-
-	return {
-		page: Number.isInteger(page) && page > 0 ? page : defaultQuery.page,
-		sortBy: todoListSortByValues.includes(sortBy) ? sortBy : defaultQuery.sortBy,
-		sortDirection: todoListSortDirectionValues.includes(sortDirection) ? sortDirection : defaultQuery.sortDirection,
-		title: params.get('title')?.trim() ?? defaultQuery.title,
-	};
-}
 
 function getLastPage(totalCount: number): number {
 	// An empty result still has a first page to show the empty state on
 	return Math.max(Math.ceil(totalCount / TODO_LISTS_PAGE_SIZE), 1);
-}
-
-function isSameQuery(a: TodoListsQuery, b: TodoListsQuery): boolean {
-	return a.page === b.page && a.sortBy === b.sortBy && a.sortDirection === b.sortDirection && a.title === b.title;
-}
-
-// Defaults are left out to keep the URL short; `undefined` removes the param
-function toQueryParams(query: TodoListsQuery): Record<string, string | number | undefined> {
-	return {
-		page: query.page === defaultQuery.page ? undefined : query.page,
-		sortBy: query.sortBy === defaultQuery.sortBy ? undefined : query.sortBy,
-		sortDirection: query.sortDirection === defaultQuery.sortDirection ? undefined : query.sortDirection,
-		title: query.title || undefined,
-	};
 }
 
 /**
@@ -175,6 +145,15 @@ export class TodoListsTable {
 				takeUntilDestroyed()
 			)
 			.subscribe((title) => this.filterControl.setValue(title, { emitEvent: false }));
+
+		// Unknown, invalid or default values in a hand-edited URL are replaced with what the table shows.
+		// The parsed query stays the same, so this doesn't load the page again
+		this.route.queryParamMap
+			.pipe(
+				filter((params) => !isCanonicalQuery(params)),
+				takeUntilDestroyed()
+			)
+			.subscribe(() => this.navigate({}, true));
 	}
 
 	protected onSortChange({ active, direction }: Sort): void {
