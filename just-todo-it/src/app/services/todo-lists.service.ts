@@ -63,6 +63,11 @@ export class TodoListsService {
 		);
 	}
 
+	// Errors with 404 for a Todo list that doesn't exist or isn't the user's
+	public getOne(uuid: string): Observable<TodoList> {
+		return this.http.get<TodoList>(`${this.todoListsUrl}/${uuid}`);
+	}
+
 	public delete(uuid: string): Observable<void> {
 		return this.http.delete<void>(`${this.todoListsUrl}/${uuid}`);
 	}
