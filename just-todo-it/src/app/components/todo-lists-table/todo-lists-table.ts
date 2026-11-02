@@ -3,7 +3,9 @@ import { Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatCard } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
+import { MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
@@ -90,9 +92,13 @@ function toQueryParams(query: TodoListsQuery): Record<string, string | number | 
 	imports: [
 		DatePipe,
 		MatButton,
+		MatCard,
 		MatCell,
 		MatCellDef,
 		MatColumnDef,
+		MatExpansionPanel,
+		MatExpansionPanelHeader,
+		MatExpansionPanelTitle,
 		MatFormField,
 		MatHeaderCell,
 		MatHeaderCellDef,
@@ -130,6 +136,8 @@ export class TodoListsTable {
 	protected readonly pageSize = TODO_LISTS_PAGE_SIZE;
 	protected readonly query = toSignal(this.query$, { requireSync: true });
 	protected readonly filterControl = new FormControl(this.query().title, { nonNullable: true });
+	// Open when arriving with a filter in the URL, so it's clear why some lists are missing
+	protected readonly filtersExpanded = Boolean(this.query().title);
 	protected readonly isLoading = signal(false);
 	protected readonly errorMessage = signal<string | null>(null);
 	protected readonly result = toSignal(

@@ -139,6 +139,14 @@ describe('TodoListsTable', () => {
 			title: 'shop',
 		});
 		expect(element().querySelector<HTMLInputElement>('input[type="search"]')!.value).toBe('shop');
+		expect(element().querySelector('mat-expansion-panel')?.classList).toContain('mat-expanded');
+	});
+
+	it('keeps the filters collapsed when the URL has no filter', async () => {
+		await open();
+
+		expectListRequest();
+		expect(element().querySelector('mat-expansion-panel')?.classList).not.toContain('mat-expanded');
 	});
 
 	it('moves between pages and keeps the page in the URL', async () => {
