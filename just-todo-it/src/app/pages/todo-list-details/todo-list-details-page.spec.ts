@@ -43,7 +43,7 @@ describe('TodoListDetailsPage', () => {
 		await render('unknown', (url) => httpTesting.expectOne(url).flush(null, { status: 404, statusText: 'Not Found' }));
 
 		expect(element.querySelector('[role="alert"]')?.textContent).toContain('Todo list not found');
-		expect(element.querySelector('a[href="/todo-lists"]')).not.toBeNull();
+		expect(element.querySelector('a[href="/"]')).not.toBeNull();
 	});
 
 	it('shows an error when the Todo list fails to load', async () => {

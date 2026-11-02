@@ -124,7 +124,7 @@ describe('TodoListsTable', () => {
 
 		const detailsLink = element().querySelector<HTMLAnchorElement>('a[aria-label="Details of List 1"]')!;
 		expect(detailsLink.textContent?.trim()).toBe('Details');
-		expect(detailsLink.getAttribute('href')).toBe('/todo-lists/1');
+		expect(detailsLink.getAttribute('href')).toBe('/1');
 	});
 
 	it('shows an empty state when the user has no Todo lists', async () => {
@@ -240,8 +240,12 @@ describe('TodoListsTable', () => {
 	});
 
 	it('sorts by name in both directions, starting from the first page', async () => {
+		// The API sorts, so each response comes back in the order the request asked for
+		const todoLists = createTodoLists(5);
+		const titles = todoLists.map(({ title }) => title);
+
 		await open('/?page=2');
-		flushList(expectListRequest(), createTodoLists(5), 12);
+		flushList(expectListRequest(), [...todoLists].reverse(), 12);
 		await stable();
 
 		const nameHeader = () => element().querySelector<HTMLElement>('th[mat-sort-header] .mat-sort-header-container')!;
@@ -252,15 +256,20 @@ describe('TodoListsTable', () => {
 		expect(TestBed.inject(Router).url).toBe('/?sortBy=title&sortDirection=asc');
 		let request = expectListRequest();
 		expect(queryParams(request)).toMatchObject({ pageNumber: '1', sortBy: 'title', sortDirection: 'ASC' });
-		flushList(request, createTodoLists(5), 12);
+		flushList(request, todoLists, 12);
 		await stable();
+
+		expect(rowTitles()).toEqual(titles);
 
 		nameHeader().click();
 		await stable();
 
 		request = expectListRequest();
 		expect(queryParams(request)).toMatchObject({ sortBy: 'title', sortDirection: 'DESC' });
-		flushList(request, createTodoLists(5), 12);
+		flushList(request, [...todoLists].reverse(), 12);
+		await stable();
+
+		expect(rowTitles()).toEqual([...titles].reverse());
 	});
 
 	it('updates the filter input when the URL changes without typing, e.g. on back navigation', async () => {

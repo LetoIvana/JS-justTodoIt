@@ -1,8 +1,18 @@
-import { Routes } from '@angular/router';
+import { Routes, UrlMatchResult, UrlSegment } from '@angular/router';
 import { CardLayout } from './components/card-layout/card-layout';
 import { MainLayout } from './components/main-layout/main-layout';
 import { loggedInGuard } from './guards/logged-in.guard';
 import { loggedOutGuard } from './guards/logged-out.guard';
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Details live at `/<uuid>`, next to `/login` and the other root paths. A plain `:uuid` would match those too,
+// and its guard would then send a logged-out user from `/login` back to `/login`, so only a uuid matches here
+function todoListUuidMatcher(segments: UrlSegment[]): UrlMatchResult | null {
+	return segments.length === 1 && UUID_PATTERN.test(segments[0].path)
+		? { consumed: segments, posParams: { uuid: segments[0] } }
+		: null;
+}
 
 export const routes: Routes = [
 	// Protected by default: every page added here needs a session
@@ -11,15 +21,14 @@ export const routes: Routes = [
 		canActivate: [loggedInGuard],
 		component: MainLayout,
 		children: [
-			// The app navigates home through '/', so this is the only place that picks the home page
-			{ path: '', pathMatch: 'full', redirectTo: 'todo-lists' },
 			{
-				path: 'todo-lists',
+				path: '',
+				pathMatch: 'full',
 				title: 'Todo lists | Just Todo It',
 				loadComponent: () => import('./pages/todo-lists/todo-lists-page').then((m) => m.TodoListsPage),
 			},
 			{
-				path: 'todo-lists/:uuid',
+				matcher: todoListUuidMatcher,
 				title: 'Todo list details | Just Todo It',
 				loadComponent: () =>
 					import('./pages/todo-list-details/todo-list-details-page').then((m) => m.TodoListDetailsPage),
