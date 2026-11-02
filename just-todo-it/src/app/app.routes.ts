@@ -8,11 +8,10 @@ export const routes: Routes = [
 	// Protected by default: every page added here needs a session
 	{
 		path: '',
+		pathMatch: 'full',
 		canActivate: [loggedInGuard],
-		children: [
-			// Temporary empty page until the Todo list table (the real home page) exists
-			{ path: '', pathMatch: 'full', children: [] },
-		],
+		title: 'Todo lists | Just Todo It',
+		loadComponent: () => import('./pages/todo-lists/todo-lists-page').then((m) => m.TodoListsPage),
 	},
 	// The deliberate exception to the protected group above
 	{
