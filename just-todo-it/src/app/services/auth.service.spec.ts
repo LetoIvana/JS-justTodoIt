@@ -43,7 +43,28 @@ describe('AuthService', () => {
 
 		expect(result).toBeNull();
 		expect(service.user()).toBeNull();
+		expect(service.serverUnavailable()).toBe(false);
 		expect(navigateSpy).not.toHaveBeenCalled();
+	});
+
+	it('flags the server as unavailable when it answers with an error other than 401', () => {
+		service.loadUser().subscribe();
+
+		httpTesting
+			.expectOne(`${environment.apiUrl}/auth/user`)
+			.flush(null, { status: 500, statusText: 'Internal Server Error' });
+
+		expect(service.user()).toBeNull();
+		expect(service.serverUnavailable()).toBe(true);
+	});
+
+	it('flags the server as unavailable when it cannot be reached', () => {
+		service.loadUser().subscribe();
+
+		httpTesting.expectOne(`${environment.apiUrl}/auth/user`).error(new ProgressEvent('error'));
+
+		expect(service.user()).toBeNull();
+		expect(service.serverUnavailable()).toBe(true);
 	});
 
 	it('stores the user after logging in', () => {

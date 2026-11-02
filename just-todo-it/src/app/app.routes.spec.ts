@@ -1,0 +1,48 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { signal } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
+import { routes } from './app.routes';
+import { User } from './models/user';
+import { AuthService } from './services/auth.service';
+
+describe('routes', () => {
+	const user = signal<User | null>(null);
+
+	beforeEach(() => {
+		TestBed.configureTestingModule({
+			providers: [
+				provideRouter(routes),
+				provideHttpClient(),
+				provideHttpClientTesting(),
+				{ provide: AuthService, useValue: { user } },
+			],
+		});
+	});
+
+	it('sends a logged-out user from the home page to the login page', async () => {
+		user.set(null);
+
+		await RouterTestingHarness.create('/');
+
+		expect(TestBed.inject(Router).url).toBe('/login');
+	});
+
+	it('keeps a logged-in user on the home page', async () => {
+		user.set({ uuid: '1', email: 'john@example.com' });
+
+		await RouterTestingHarness.create('/');
+
+		expect(TestBed.inject(Router).url).toBe('/');
+	});
+
+	it('sends a logged-in user from the login page to the home page', async () => {
+		user.set({ uuid: '1', email: 'john@example.com' });
+
+		await RouterTestingHarness.create('/login');
+
+		expect(TestBed.inject(Router).url).toBe('/');
+	});
+});

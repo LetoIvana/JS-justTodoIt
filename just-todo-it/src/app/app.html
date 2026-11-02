@@ -1,1 +1,6 @@
-<router-outlet />
+<!-- Without knowing whether there is a session, no page (not even the login one) can be shown correctly -->
+@if (serverUnavailable()) {
+	<jti-server-unavailable />
+} @else {
+	<router-outlet />
+}

@@ -5,14 +5,12 @@ import { MatError, MatFormField, MatLabel, MatSuffix } from '@angular/material/f
 import { MatInput } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { MainLayout } from '../../components/main-layout/main-layout';
 import { PasswordVisibilityToggle } from '../../components/password-visibility-toggle/password-visibility-toggle';
 import { AuthService } from '../../services/auth.service';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
 
 @Component({
 	imports: [
-		MainLayout,
 		MatButton,
 		MatError,
 		MatFormField,

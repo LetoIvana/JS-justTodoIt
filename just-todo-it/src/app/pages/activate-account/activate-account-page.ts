@@ -2,13 +2,12 @@ import { Component, computed, inject, input } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, EMPTY, switchMap } from 'rxjs';
-import { CardLayout } from '../../components/card-layout/card-layout';
 import { SetPasswordForm } from '../../components/set-password-form/set-password-form';
 import { AuthService } from '../../services/auth.service';
 import { getEmailFromToken } from '../../utils/get-email-from-token';
 
 @Component({
-	imports: [CardLayout, RouterLink, SetPasswordForm],
+	imports: [RouterLink, SetPasswordForm],
 	selector: 'jti-activate-account-page',
 	styleUrl: './activate-account-page.scss',
 	templateUrl: './activate-account-page.html',

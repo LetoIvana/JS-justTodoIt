@@ -6,12 +6,11 @@ import { MatInput } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { MainLayout } from '../../components/main-layout/main-layout';
 import { AuthService } from '../../services/auth.service';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
 
 @Component({
-	imports: [MainLayout, MatButton, MatError, MatFormField, MatInput, MatLabel, ReactiveFormsModule, RouterLink],
+	imports: [MatButton, MatError, MatFormField, MatInput, MatLabel, ReactiveFormsModule, RouterLink],
 	selector: 'jti-register-page',
 	styleUrl: './register-page.scss',
 	templateUrl: './register-page.html',
