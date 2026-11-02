@@ -124,7 +124,7 @@ describe('TodoListsTable', () => {
 
 		const detailsLink = element().querySelector<HTMLAnchorElement>('a[aria-label="Details of List 1"]')!;
 		expect(detailsLink.textContent?.trim()).toBe('Details');
-		expect(detailsLink.getAttribute('href')).toBe('/1');
+		expect(detailsLink.getAttribute('href')).toBe('/todo-lists/1');
 	});
 
 	it('shows an empty state when the user has no Todo lists', async () => {

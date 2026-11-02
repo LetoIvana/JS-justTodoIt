@@ -11,9 +11,10 @@ export const routes: Routes = [
 		canActivate: [loggedInGuard],
 		component: MainLayout,
 		children: [
+			// The app navigates home through '/', so this is the only place that picks the home page
+			{ path: '', pathMatch: 'full', redirectTo: 'todo-lists' },
 			{
-				path: '',
-				pathMatch: 'full',
+				path: 'todo-lists',
 				title: 'Todo lists | Just Todo It',
 				loadComponent: () => import('./pages/todo-lists/todo-lists-page').then((m) => m.TodoListsPage),
 			},

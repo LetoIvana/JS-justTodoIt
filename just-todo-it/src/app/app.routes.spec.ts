@@ -30,12 +30,20 @@ describe('routes', () => {
 		expect(TestBed.inject(Router).url).toBe('/login');
 	});
 
-	it('keeps a logged-in user on the home page', async () => {
+	it('sends a logged-in user from the root to the todo lists page', async () => {
 		user.set({ uuid: '1', email: 'john@example.com' });
 
 		await RouterTestingHarness.create('/');
 
-		expect(TestBed.inject(Router).url).toBe('/');
+		expect(TestBed.inject(Router).url).toBe('/todo-lists');
+	});
+
+	it('sends a logged-in user from an unknown page to the todo lists page', async () => {
+		user.set({ uuid: '1', email: 'john@example.com' });
+
+		await RouterTestingHarness.create('/unknown');
+
+		expect(TestBed.inject(Router).url).toBe('/todo-lists');
 	});
 
 	it('sends a logged-in user from the login page to the home page', async () => {
@@ -43,6 +51,6 @@ describe('routes', () => {
 
 		await RouterTestingHarness.create('/login');
 
-		expect(TestBed.inject(Router).url).toBe('/');
+		expect(TestBed.inject(Router).url).toBe('/todo-lists');
 	});
 });

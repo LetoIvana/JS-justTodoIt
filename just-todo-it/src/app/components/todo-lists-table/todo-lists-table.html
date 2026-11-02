@@ -54,7 +54,11 @@
 					<ng-container matColumnDef="actions">
 						<th *matHeaderCellDef mat-header-cell class="todo-lists-table__actions">Actions</th>
 						<td *matCellDef="let todoList" mat-cell class="todo-lists-table__actions">
-							<a matButton [attr.aria-label]="'Details of ' + todoList.title" [routerLink]="['/', todoList.uuid]">
+							<a
+								matButton
+								[attr.aria-label]="'Details of ' + todoList.title"
+								[routerLink]="['/todo-lists', todoList.uuid]"
+							>
 								Details
 							</a>
 							<button matIconButton [attr.aria-label]="'Delete ' + todoList.title" (click)="onDelete(todoList)">
