@@ -8,10 +8,16 @@ export const routes: Routes = [
 	// Protected by default: every page added here needs a session
 	{
 		path: '',
-		pathMatch: 'full',
 		canActivate: [loggedInGuard],
-		title: 'Todo lists | Just Todo It',
-		loadComponent: () => import('./pages/todo-lists/todo-lists-page').then((m) => m.TodoListsPage),
+		component: MainLayout,
+		children: [
+			{
+				path: '',
+				pathMatch: 'full',
+				title: 'Todo lists | Just Todo It',
+				loadComponent: () => import('./pages/todo-lists/todo-lists-page').then((m) => m.TodoListsPage),
+			},
+		],
 	},
 	// The deliberate exception to the protected group above
 	{

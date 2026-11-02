@@ -1,0 +1,69 @@
+<mat-form-field class="todo-lists-table__filter" subscriptSizing="dynamic">
+	<mat-label>Filter by name</mat-label>
+	<input matInput type="search" [formControl]="filterControl" />
+</mat-form-field>
+
+<div class="todo-lists-table__progress">
+	@if (isLoading()) {
+		<mat-progress-bar mode="indeterminate" />
+	}
+</div>
+
+@if (errorMessage(); as errorMessage) {
+	<p class="todo-lists-table__error" role="alert">{{ errorMessage }}</p>
+}
+
+@if (result(); as result) {
+	@if (result.totalCount === 0) {
+		<p class="todo-lists-table__empty">
+			@if (query().title) {
+				No Todo lists match "{{ query().title }}".
+			} @else {
+				You don't have any Todo lists yet.
+			}
+		</p>
+	} @else {
+		<table
+			mat-table
+			matSort
+			matSortDisableClear
+			[dataSource]="result.todoLists"
+			[matSortActive]="query().sortBy"
+			[matSortDirection]="query().sortDirection"
+			(matSortChange)="onSortChange($event)"
+		>
+			<ng-container matColumnDef="title">
+				<th *matHeaderCellDef mat-header-cell mat-sort-header>Name</th>
+				<td *matCellDef="let todoList" mat-cell>{{ todoList.title }}</td>
+			</ng-container>
+
+			<ng-container matColumnDef="created">
+				<th *matHeaderCellDef mat-header-cell mat-sort-header>Date created</th>
+				<td *matCellDef="let todoList" mat-cell>{{ todoList.created | date: 'medium' }}</td>
+			</ng-container>
+
+			<ng-container matColumnDef="actions">
+				<th *matHeaderCellDef mat-header-cell class="todo-lists-table__actions">Actions</th>
+				<td *matCellDef="let todoList" mat-cell class="todo-lists-table__actions">
+					<a mat-button [attr.aria-label]="'Details of ' + todoList.title" [routerLink]="['/', todoList.uuid]">
+						Details
+					</a>
+					<button mat-icon-button [attr.aria-label]="'Delete ' + todoList.title" (click)="onDelete(todoList)">
+						<mat-icon>delete</mat-icon>
+					</button>
+				</td>
+			</ng-container>
+
+			<tr *matHeaderRowDef="columns" mat-header-row></tr>
+			<tr *matRowDef="let row; columns: columns" mat-row></tr>
+		</table>
+
+		<mat-paginator
+			hidePageSize
+			[length]="result.totalCount"
+			[pageIndex]="query().page - 1"
+			[pageSize]="pageSize"
+			(page)="onPageChange($event)"
+		/>
+	}
+}

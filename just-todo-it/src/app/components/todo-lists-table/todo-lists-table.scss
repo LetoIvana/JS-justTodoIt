@@ -1,0 +1,29 @@
+:host {
+	display: block;
+}
+
+.todo-lists-table__filter {
+	width: 100%;
+}
+
+// Reserves the bar's height so the table doesn't jump while loading
+.todo-lists-table__progress {
+	height: 4px;
+	margin-top: 8px;
+}
+
+.todo-lists-table__error {
+	color: var(--mat-sys-error);
+}
+
+.todo-lists-table__empty {
+	padding: 32px 0;
+	text-align: center;
+	font: var(--mat-sys-body-large);
+}
+
+.todo-lists-table__actions {
+	width: 1%;
+	white-space: nowrap;
+	text-align: end;
+}
