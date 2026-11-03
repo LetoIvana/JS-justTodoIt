@@ -12,7 +12,7 @@ export interface TodoList {
 	todos?: TodoItem[];
 }
 
-// What the form edits and the service sends; a new item has no uuid yet
+// What the form edits and the service sends; a new item has no uuid yet, or an empty one
 export interface TodoItemData {
 	uuid?: string;
 	title: string;

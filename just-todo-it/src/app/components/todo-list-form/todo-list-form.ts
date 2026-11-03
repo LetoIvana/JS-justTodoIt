@@ -27,7 +27,7 @@ import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { finalize, Observable, Subscription } from 'rxjs';
-import { TodoItemData, TodoList, TodoListData, toTodoListData } from '../../models/todo-list';
+import { TodoItemData, TodoList, TodoListData } from '../../models/todo-list';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
 
 type TodoItemGroup = FormGroup<{
@@ -43,7 +43,7 @@ function requiredTrimmed(control: AbstractControl<string>): ValidationErrors | n
 }
 
 // Material also shows errors on every field once the form has been submitted, which would flag an item added
-// after a save straight away. An invalid submit marks every field as touched, so touched alone is enough
+// after a failed save straight away. An invalid submit marks every field as touched, so touched alone is enough
 const touchedErrorStateMatcher: ErrorStateMatcher = {
 	isErrorState: (control) => !!control?.invalid && control.touched,
 };
@@ -55,7 +55,7 @@ function atLeastOneItem(control: AbstractControl<unknown[]>): ValidationErrors |
 /**
  * Todo list form shared by creating and editing a list, so both have the same fields, validation and item handling.
  * The parent passes the starting values and the API call; the form sends the complete list, since the API replaces
- * all of a list's items on every update, and resets to the saved list so new items keep their uuids on the next save.
+ * all of a list's items on every update.
  */
 @Component({
 	imports: [
@@ -127,7 +127,7 @@ export class TodoListForm {
 		const { title, todos } = this.form.getRawValue();
 		const value: TodoListData = {
 			title: title.trim(),
-			todos: todos.map(({ uuid, title, done }) => ({ ...(uuid && { uuid }), title: title.trim(), done })),
+			todos: todos.map((item) => ({ ...item, title: item.title.trim() })),
 		};
 
 		this.isSubmitting.set(true);
@@ -143,10 +143,7 @@ export class TodoListForm {
 				})
 			)
 			.subscribe({
-				next: (todoList) => {
-					this.reset(toTodoListData(todoList));
-					this.saved.emit(todoList);
-				},
+				next: (todoList) => this.saved.emit(todoList),
 				error: (error: unknown) => this.errorMessage.set(getApiErrorMessage(error)),
 			});
 	}

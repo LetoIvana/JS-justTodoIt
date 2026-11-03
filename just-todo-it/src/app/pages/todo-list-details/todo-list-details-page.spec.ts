@@ -5,7 +5,6 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { provideRouter, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { TodoList } from '../../models/todo-list';
-import { TodoListsTableStateService } from '../../services/todo-lists-table-state.service';
 import { TodoListDetailsPage } from './todo-list-details-page';
 
 describe('TodoListDetailsPage', () => {
@@ -82,7 +81,6 @@ describe('TodoListDetailsPage', () => {
 			],
 		}).compileComponents();
 
-		TestBed.inject(TodoListsTableStateService).queryParams.set({ page: 2 });
 		fixture = TestBed.createComponent(TodoListDetailsPage);
 		element = fixture.nativeElement;
 		httpTesting = TestBed.inject(HttpTestingController);
@@ -129,7 +127,7 @@ describe('TodoListDetailsPage', () => {
 		expect(snackBarText()).toContain('Todo list saved');
 	});
 
-	it('returns to the table as the user left it after saving', async () => {
+	it('returns to the table after saving', async () => {
 		const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 		await renderGroceries();
 
@@ -137,7 +135,7 @@ describe('TodoListDetailsPage', () => {
 		httpTesting.expectOne({ method: 'PATCH', url: `${todoListsUrl}/1` }).flush(groceries);
 		await fixture.whenStable();
 
-		expect(navigateSpy).toHaveBeenCalledWith(['/'], { queryParams: { page: 2 } });
+		expect(navigateSpy).toHaveBeenCalledWith(['/']);
 	});
 
 	it('stays on the page when saving fails', async () => {

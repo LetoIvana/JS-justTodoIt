@@ -143,7 +143,10 @@ describe('TodoListForm', () => {
 		await setTitle('  Groceries ');
 		await submit();
 
-		expect(submitAction).toHaveBeenCalledWith({ title: 'Groceries', todos: [{ title: 'Milk', done: false }] });
+		expect(submitAction).toHaveBeenCalledWith({
+			title: 'Groceries',
+			todos: [{ uuid: '', title: 'Milk', done: false }],
+		});
 	});
 
 	it('adds and removes items', async () => {
@@ -170,7 +173,7 @@ describe('TodoListForm', () => {
 		expect(document.activeElement).toBe(itemInput(0));
 	});
 
-	it('submits renamed items and their done state, with uuids for existing items', async () => {
+	it('submits renamed items and their done state, with an empty uuid for new items', async () => {
 		await render({ title: 'Groceries', todos: [{ uuid: 'a', title: 'Milk', done: false }] });
 
 		await setItemTitle(0, 'Oat milk');
@@ -182,12 +185,12 @@ describe('TodoListForm', () => {
 			title: 'Groceries',
 			todos: [
 				{ uuid: 'a', title: 'Oat milk', done: true },
-				{ title: 'Bread', done: false },
+				{ uuid: '', title: 'Bread', done: false },
 			],
 		});
 	});
 
-	it('resets to the saved list and emits it after a successful save', async () => {
+	it('emits the saved list after a successful save', async () => {
 		const list = savedList({ todos: [{ uuid: 'b', title: 'Bread', done: false }] });
 		submitAction.mockReturnValue(of(list));
 		await render({ title: 'Groceries', todos: [] });
@@ -196,16 +199,10 @@ describe('TodoListForm', () => {
 		await submit();
 
 		expect(saved).toHaveBeenCalledWith(list);
-
-		await submit();
-
-		expect(submitAction).toHaveBeenLastCalledWith({
-			title: 'Groceries',
-			todos: [{ uuid: 'b', title: 'Bread', done: false }],
-		});
 	});
 
-	it('does not flag a newly added item after a successful save', async () => {
+	it('does not flag a newly added item after a failed save', async () => {
+		submitAction.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
 		await render({ title: 'Groceries', todos: [{ uuid: 'a', title: 'Milk', done: false }] });
 		await submit();
 

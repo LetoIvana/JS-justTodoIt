@@ -107,7 +107,7 @@ describe('TodoListsService', () => {
 				title: 'Groceries',
 				todos: [
 					{ uuid: 'a', title: 'Milk', done: true },
-					{ title: 'Bread', done: false },
+					{ uuid: '', title: 'Bread', done: false },
 				],
 			})
 			.subscribe();

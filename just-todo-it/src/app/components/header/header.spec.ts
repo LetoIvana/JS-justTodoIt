@@ -24,7 +24,8 @@ describe('Header', () => {
 		await TestBed.configureTestingModule({
 			imports: [Header],
 			providers: [
-				provideRouter([]),
+				// Matches every URL, so the links' active state can follow navigation anywhere
+				provideRouter([{ path: '**', children: [] }]),
 				provideHttpClient(withInterceptors([unauthorizedInterceptor])),
 				provideHttpClientTesting(),
 			],
@@ -45,6 +46,15 @@ describe('Header', () => {
 			(button) => button.textContent?.trim() === 'Log out'
 		)!;
 		logoutButton.click();
+	}
+
+	async function isTodoListsLinkActiveAt(url: string): Promise<boolean> {
+		await TestBed.inject(Router).navigateByUrl(url);
+		await fixture.whenStable();
+
+		return [...element.querySelectorAll('a')]
+			.find((link) => link.textContent?.trim() === 'Todo lists')!
+			.classList.contains('header__link--active');
 	}
 
 	it('shows the Log in and Register links when logged out', () => {
@@ -79,6 +89,14 @@ describe('Header', () => {
 		await logIn();
 
 		expect(element.querySelector('a[href="/?page=2"]')?.textContent).toContain('Todo lists');
+	});
+
+	it('marks the Todo lists link active only on the table, whatever its query params', async () => {
+		await logIn();
+
+		expect(await isTodoListsLinkActiveAt('/?page=2')).toBe(true);
+		expect(await isTodoListsLinkActiveAt('/create')).toBe(false);
+		expect(await isTodoListsLinkActiveAt('/3f2b8c1e-9d4a-4e6b-8a1f-2c7d5e9b0a13')).toBe(false);
 	});
 
 	it('logs out from the menu and navigates to the login page', async () => {

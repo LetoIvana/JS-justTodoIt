@@ -8,7 +8,6 @@ import { catchError, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { TodoListForm } from '../../components/todo-list-form/todo-list-form';
 import { TodoList, TodoListData, toTodoListData } from '../../models/todo-list';
 import { TodoListsService } from '../../services/todo-lists.service';
-import { TodoListsTableStateService } from '../../services/todo-lists-table-state.service';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
 
 type TodoListState =
@@ -42,14 +41,13 @@ export class TodoListDetailsPage {
 
 		return state.status === 'loaded' ? toTodoListData(state.todoList) : null;
 	});
-	protected readonly tableQueryParams = inject(TodoListsTableStateService).queryParams;
 
 	protected readonly save = (value: TodoListData): Observable<TodoList> =>
 		this.todoListsService.update(this.uuid(), value);
 
 	protected onSaved(): void {
 		this.snackBar.open('Todo list saved', 'Close');
-		this.router.navigate(['/'], { queryParams: this.tableQueryParams() });
+		this.router.navigate(['/']);
 	}
 
 	private loadTodoList(uuid: string): Observable<TodoListState> {
