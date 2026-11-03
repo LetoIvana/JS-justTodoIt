@@ -105,7 +105,7 @@ describe('TodoListDetailsPage', () => {
 	});
 
 	it('sends every item when saving: existing with uuid, new without, removed left out', async () => {
-		const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate');
+		vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 		await renderGroceries();
 
 		await click(rows()[0].querySelector<HTMLButtonElement>('button[aria-label="Remove Milk"]')!);
@@ -132,23 +132,30 @@ describe('TodoListDetailsPage', () => {
 		await fixture.whenStable();
 
 		expect(snackBarText()).toContain('Todo list saved');
-		expect(navigateSpy).not.toHaveBeenCalled();
 	});
 
-	it('sends uuids from the previous save on the next save', async () => {
+	it('returns to the table as the user left it after saving', async () => {
+		const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 		await renderGroceries();
-		await addItem('Eggs');
+
+		await save();
+		httpTesting.expectOne({ method: 'PATCH', url: `${todoListsUrl}/1` }).flush(groceries);
+		await fixture.whenStable();
+
+		expect(navigateSpy).toHaveBeenCalledWith(['/'], { queryParams: { page: 2 } });
+	});
+
+	it('stays on the page when saving fails', async () => {
+		const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+		await renderGroceries();
+
 		await save();
 		httpTesting
 			.expectOne({ method: 'PATCH', url: `${todoListsUrl}/1` })
-			.flush({ ...groceries, todos: [...groceries.todos!, { uuid: 'e', title: 'Eggs', done: false }] });
+			.flush(null, { status: 500, statusText: 'Server Error' });
 		await fixture.whenStable();
 
-		await save();
-
-		const request = httpTesting.expectOne({ method: 'PATCH', url: `${todoListsUrl}/1` });
-		expect(request.request.body.todos).toEqual([...groceries.todos!, { uuid: 'e', title: 'Eggs', done: false }]);
-		request.flush(groceries);
+		expect(navigateSpy).not.toHaveBeenCalled();
 	});
 
 	it('cancels a pending save when switching to another list', async () => {

@@ -3,7 +3,7 @@ import { Component, computed, inject, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { catchError, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { TodoListForm } from '../../components/todo-list-form/todo-list-form';
 import { TodoList, TodoListData, toTodoListData } from '../../models/todo-list';
@@ -26,6 +26,7 @@ type TodoListState =
 export class TodoListDetailsPage {
 	private readonly todoListsService = inject(TodoListsService);
 	private readonly snackBar = inject(MatSnackBar);
+	private readonly router = inject(Router);
 
 	// Bound from the `:uuid` route param
 	public readonly uuid = input.required<string>();
@@ -48,6 +49,7 @@ export class TodoListDetailsPage {
 
 	protected onSaved(): void {
 		this.snackBar.open('Todo list saved', 'Close');
+		this.router.navigate(['/'], { queryParams: this.tableQueryParams() });
 	}
 
 	private loadTodoList(uuid: string): Observable<TodoListState> {
