@@ -1,6 +1,7 @@
 import {
 	afterNextRender,
 	Component,
+	DestroyRef,
 	effect,
 	ElementRef,
 	inject,
@@ -21,6 +22,7 @@ import {
 } from '@angular/forms';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
@@ -39,6 +41,12 @@ type TodoItemGroup = FormGroup<{
 function requiredTrimmed(control: AbstractControl<string>): ValidationErrors | null {
 	return control.value.trim() ? null : { required: true };
 }
+
+// Material also shows errors on every field once the form has been submitted, which would flag an item added
+// after a save straight away. An invalid submit marks every field as touched, so touched alone is enough
+const touchedErrorStateMatcher: ErrorStateMatcher = {
+	isErrorState: (control) => !!control?.invalid && control.touched,
+};
 
 function atLeastOneItem(control: AbstractControl<unknown[]>): ValidationErrors | null {
 	return control.value.length ? null : { noItems: true };
@@ -61,6 +69,7 @@ function atLeastOneItem(control: AbstractControl<unknown[]>): ValidationErrors |
 		MatLabel,
 		ReactiveFormsModule,
 	],
+	providers: [{ provide: ErrorStateMatcher, useValue: touchedErrorStateMatcher }],
 	selector: 'jti-todo-list-form',
 	styleUrl: './todo-list-form.scss',
 	templateUrl: './todo-list-form.html',
@@ -93,6 +102,9 @@ export class TodoListForm {
 				this.reset(initialValue);
 			});
 		});
+
+		// A save still in flight when the user leaves must not navigate them or report on a form that's gone
+		inject(DestroyRef).onDestroy(() => this.submitSubscription?.unsubscribe());
 	}
 
 	protected addItem(): void {

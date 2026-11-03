@@ -158,6 +158,18 @@ describe('CreateTodoListPage', () => {
 		expect(navigateSpy()).not.toHaveBeenCalled();
 	});
 
+	it('cancels a pending create when the user leaves the page', async () => {
+		await render();
+		await fillForm('Groceries', [{ title: 'Milk', done: true }]);
+		await submit();
+		const pendingCreate = httpTesting.expectOne({ method: 'POST', url: todoListsUrl });
+
+		fixture.destroy();
+
+		expect(pendingCreate.cancelled).toBe(true);
+		expect(navigateSpy()).not.toHaveBeenCalled();
+	});
+
 	it('links back to the table as the user left it', async () => {
 		TestBed.inject(TodoListsTableStateService).queryParams.set({ page: 2 });
 

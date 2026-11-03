@@ -151,6 +151,16 @@ describe('TodoListDetailsPage', () => {
 		request.flush(groceries);
 	});
 
+	it('cancels a pending save when switching to another list', async () => {
+		await renderGroceries();
+		await save();
+		const pendingSave = httpTesting.expectOne({ method: 'PATCH', url: `${todoListsUrl}/1` });
+
+		await render('2', (url) => httpTesting.expectOne(url).flush({ ...groceries, uuid: '2', title: 'Movies' }));
+
+		expect(pendingSave.cancelled).toBe(true);
+	});
+
 	it('shows a readable error when two items share a name', async () => {
 		await renderGroceries();
 

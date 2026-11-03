@@ -205,6 +205,15 @@ describe('TodoListForm', () => {
 		});
 	});
 
+	it('does not flag a newly added item after a successful save', async () => {
+		await render({ title: 'Groceries', todos: [{ uuid: 'a', title: 'Milk', done: false }] });
+		await submit();
+
+		await addItem();
+
+		expect(rows().at(-1)?.textContent).not.toContain('Item name is required.');
+	});
+
 	it('shows the API error and keeps the values', async () => {
 		submitAction.mockReturnValue(
 			throwError(() => new HttpErrorResponse({ status: 409, error: { code: 'todo_list_with_same_title_exists' } }))
