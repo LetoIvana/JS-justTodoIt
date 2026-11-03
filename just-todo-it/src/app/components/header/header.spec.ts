@@ -5,6 +5,7 @@ import { provideRouter, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { unauthorizedInterceptor } from '../../interceptors/unauthorized.interceptor';
 import { AuthService } from '../../services/auth.service';
+import { TodoListsTableStateService } from '../../services/todo-lists-table-state.service';
 import { Header } from './header';
 
 describe('Header', () => {
@@ -67,6 +68,17 @@ describe('Header', () => {
 		await logIn();
 
 		expect(element.querySelector('a[href="/create"]')?.textContent).toContain('Create a new list');
+	});
+
+	it('links to the Todo lists table as the user left it, only when logged in', async () => {
+		TestBed.inject(TodoListsTableStateService).queryParams.set({ page: 2 });
+		await fixture.whenStable();
+
+		expect(element.querySelector('a[href="/?page=2"]')).toBeNull();
+
+		await logIn();
+
+		expect(element.querySelector('a[href="/?page=2"]')?.textContent).toContain('Todo lists');
 	});
 
 	it('logs out from the menu and navigates to the login page', async () => {

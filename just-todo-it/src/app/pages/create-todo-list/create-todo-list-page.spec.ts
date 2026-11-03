@@ -5,7 +5,6 @@ import { MATERIAL_ANIMATIONS } from '@angular/material/core';
 import { provideRouter, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { TodoList } from '../../models/todo-list';
-import { TodoListsTableStateService } from '../../services/todo-lists-table-state.service';
 import { CreateTodoListPage } from './create-todo-list-page';
 
 describe('CreateTodoListPage', () => {
@@ -168,16 +167,5 @@ describe('CreateTodoListPage', () => {
 
 		expect(pendingCreate.cancelled).toBe(true);
 		expect(navigateSpy()).not.toHaveBeenCalled();
-	});
-
-	it('links back to the table as the user left it', async () => {
-		TestBed.inject(TodoListsTableStateService).queryParams.set({ page: 2 });
-
-		await render();
-
-		const backLink = [...element.querySelectorAll('a')].find((link) =>
-			link.textContent?.includes('Back to todo lists')
-		);
-		expect(backLink?.getAttribute('href')).toBe('/?page=2');
 	});
 });

@@ -1,9 +1,6 @@
 @let state = this.state();
 
-<div class="todo-list-details-page__header">
-	<h1>{{ state.status === 'loaded' ? 'Edit todo list' : 'Todo list details' }}</h1>
-	<a routerLink="/" [queryParams]="tableQueryParams()">Back to todo lists</a>
-</div>
+<h1>{{ state.status === 'loaded' ? 'Edit todo list' : 'Todo list details' }}</h1>
 
 @if (initialValue(); as initialValue) {
 	<jti-todo-list-form submitLabel="Save" [initialValue]="initialValue" [submitAction]="save" (saved)="onSaved()" />

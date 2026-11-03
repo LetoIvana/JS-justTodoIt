@@ -3,7 +3,7 @@ import { Component, computed, inject, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { catchError, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { TodoListForm } from '../../components/todo-list-form/todo-list-form';
 import { TodoList, TodoListData, toTodoListData } from '../../models/todo-list';
@@ -18,7 +18,7 @@ type TodoListState =
 	| { status: 'error'; message: string };
 
 @Component({
-	imports: [MatProgressBar, RouterLink, TodoListForm],
+	imports: [MatProgressBar, TodoListForm],
 	selector: 'jti-todo-list-details-page',
 	styleUrl: './todo-list-details-page.scss',
 	templateUrl: './todo-list-details-page.html',

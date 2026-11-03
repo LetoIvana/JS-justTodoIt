@@ -5,8 +5,9 @@ import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbar } from '@angular/material/toolbar';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { IsActiveMatchOptions, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { TodoListsTableStateService } from '../../services/todo-lists-table-state.service';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
 
 @Component({
@@ -21,6 +22,14 @@ export class Header {
 	private readonly snackBar = inject(MatSnackBar);
 
 	protected readonly user = this.authService.user;
+	protected readonly tableQueryParams = inject(TodoListsTableStateService).queryParams;
+	// Exact, so `/` isn't active on every page; the table's own query params don't matter
+	protected readonly todoListsActiveOptions: IsActiveMatchOptions = {
+		paths: 'exact',
+		queryParams: 'ignored',
+		matrixParams: 'ignored',
+		fragment: 'ignored',
+	};
 
 	protected onLogout(): void {
 		this.authService.logout().subscribe({

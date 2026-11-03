@@ -66,10 +66,6 @@ describe('TodoListDetailsPage', () => {
 		await click(element.querySelector<HTMLButtonElement>('button[type="submit"]')!);
 	}
 
-	function backLink(): HTMLAnchorElement | undefined {
-		return [...element.querySelectorAll('a')].find((link) => /Back to todo lists/i.test(link.textContent ?? ''));
-	}
-
 	// The snack bar is rendered in an overlay outside the page
 	function snackBarText(): string | undefined {
 		return document.querySelector('mat-snack-bar-container')?.textContent;
@@ -101,7 +97,6 @@ describe('TodoListDetailsPage', () => {
 		expect(element.querySelector<HTMLInputElement>('.todo-list-form__title input')?.value).toBe('Groceries');
 		expect(rows().map((_, index) => itemInput(index).value)).toEqual(['Milk', 'Bread']);
 		expect(rows()[1].querySelector<HTMLInputElement>('input[type="checkbox"]')?.checked).toBe(true);
-		expect(backLink()?.getAttribute('href')).toBe('/?page=2');
 	});
 
 	it('sends every item when saving: existing with uuid, new without, removed left out', async () => {
@@ -184,7 +179,6 @@ describe('TodoListDetailsPage', () => {
 		await render('unknown', (url) => httpTesting.expectOne(url).flush(null, { status: 404, statusText: 'Not Found' }));
 
 		expect(element.querySelector('[role="alert"]')?.textContent).toContain('Todo list not found');
-		expect(backLink()?.getAttribute('href')).toBe('/?page=2');
 	});
 
 	it('shows an error when the Todo list fails to load', async () => {

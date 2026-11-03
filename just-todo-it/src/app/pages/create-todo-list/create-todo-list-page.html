@@ -1,6 +1,3 @@
-<div class="create-todo-list-page__header">
-	<h1>Create a new todo list</h1>
-	<a routerLink="/" [queryParams]="tableQueryParams()">Back to todo lists</a>
-</div>
+<h1>Create a new todo list</h1>
 
 <jti-todo-list-form submitLabel="Create" [initialValue]="emptyList" [submitAction]="create" (saved)="onCreated()" />

@@ -1,16 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { catchError, EMPTY, Observable, of, switchMap } from 'rxjs';
 import { TodoListForm } from '../../components/todo-list-form/todo-list-form';
 import { TodoList, TodoListData } from '../../models/todo-list';
 import { TodoListsService } from '../../services/todo-lists.service';
-import { TodoListsTableStateService } from '../../services/todo-lists-table-state.service';
 
 @Component({
-	imports: [RouterLink, TodoListForm],
+	imports: [TodoListForm],
 	selector: 'jti-create-todo-list-page',
-	styleUrl: './create-todo-list-page.scss',
 	templateUrl: './create-todo-list-page.html',
 })
 export class CreateTodoListPage {
@@ -18,7 +16,6 @@ export class CreateTodoListPage {
 	private readonly snackBar = inject(MatSnackBar);
 	private readonly todoListsService = inject(TodoListsService);
 
-	protected readonly tableQueryParams = inject(TodoListsTableStateService).queryParams;
 	protected readonly emptyList: TodoListData = { title: '', todos: [] };
 
 	// The API creates every item as not done, so the done items are saved with a follow-up update
