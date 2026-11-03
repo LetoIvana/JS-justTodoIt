@@ -13,7 +13,7 @@ describe('TodoListDetailsPage', () => {
 	async function render(uuid: string, respond: (url: string) => void): Promise<void> {
 		fixture.componentRef.setInput('uuid', uuid);
 		fixture.detectChanges();
-		respond(`${environment.apiUrl}/todo-lists/${uuid}`);
+		respond(`${environment.apiUrl}/todo-lists/${uuid}?relations=todos`);
 		await fixture.whenStable();
 	}
 

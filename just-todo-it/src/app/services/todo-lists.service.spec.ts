@@ -86,4 +86,41 @@ describe('TodoListsService', () => {
 			totalCount: matches.length,
 		});
 	});
+	it('requests the items with a single Todo list', () => {
+		service.getOne('1').subscribe();
+
+		httpTesting.expectOne(`${todoListsUrl}/1?relations=todos`).flush(todoList('1'));
+	});
+
+	it('creates a Todo list with only the item titles', () => {
+		service.create({ title: 'Groceries', todos: [{ title: 'Milk', done: true }] }).subscribe();
+		const testRequest = httpTesting.expectOne(todoListsUrl);
+
+		expect(testRequest.request.method).toBe('POST');
+		expect(testRequest.request.body).toStrictEqual({ title: 'Groceries', todos: [{ title: 'Milk' }] });
+		testRequest.flush(todoList('Groceries'));
+	});
+
+	it('updates a Todo list with every item, keeping uuids only for existing ones', () => {
+		service
+			.update('1', {
+				title: 'Groceries',
+				todos: [
+					{ uuid: 'a', title: 'Milk', done: true },
+					{ title: 'Bread', done: false },
+				],
+			})
+			.subscribe();
+		const testRequest = httpTesting.expectOne(`${todoListsUrl}/1`);
+
+		expect(testRequest.request.method).toBe('PATCH');
+		expect(testRequest.request.body).toStrictEqual({
+			title: 'Groceries',
+			todos: [
+				{ uuid: 'a', title: 'Milk', done: true },
+				{ title: 'Bread', done: false },
+			],
+		});
+		testRequest.flush(todoList('Groceries'));
+	});
 });

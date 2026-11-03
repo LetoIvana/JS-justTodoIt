@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { TodoList } from '../models/todo-list';
+import { TodoList, TodoListData } from '../models/todo-list';
 
 export const todoListSortByValues = ['title', 'created'] as const;
 export const todoListSortDirectionValues = ['asc', 'desc'] as const;
@@ -65,7 +65,21 @@ export class TodoListsService {
 
 	// Errors with 404 for a Todo list that doesn't exist or isn't the user's
 	public getOne(uuid: string): Observable<TodoList> {
-		return this.http.get<TodoList>(`${this.todoListsUrl}/${uuid}`);
+		return this.http.get<TodoList>(`${this.todoListsUrl}/${uuid}`, { params: { relations: 'todos' } });
+	}
+
+	// The API creates every item as not done, so only the titles are sent
+	public create({ title, todos }: TodoListData): Observable<TodoList> {
+		return this.http.post<TodoList>(this.todoListsUrl, { title, todos: todos.map(({ title }) => ({ title })) });
+	}
+
+	// The API replaces all of the list's items: ones with a uuid are updated, ones without are created
+	// and any existing item that isn't sent is deleted
+	public update(uuid: string, { title, todos }: TodoListData): Observable<TodoList> {
+		return this.http.patch<TodoList>(`${this.todoListsUrl}/${uuid}`, {
+			title,
+			todos: todos.map(({ uuid, title, done }) => ({ ...(uuid && { uuid }), title, done })),
+		});
 	}
 
 	public delete(uuid: string): Observable<void> {

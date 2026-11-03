@@ -47,7 +47,7 @@ describe('routes', () => {
 
 		const harness = await RouterTestingHarness.create(`/${todoListUuid}`);
 		TestBed.inject(HttpTestingController)
-			.expectOne(`${environment.apiUrl}/todo-lists/${todoListUuid}`)
+			.expectOne(`${environment.apiUrl}/todo-lists/${todoListUuid}?relations=todos`)
 			.flush({ uuid: todoListUuid, title: 'Groceries', created: '2026-01-01T00:00:00.000Z' });
 		await harness.fixture.whenStable();
 
