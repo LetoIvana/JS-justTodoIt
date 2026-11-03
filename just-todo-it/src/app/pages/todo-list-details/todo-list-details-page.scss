@@ -1,0 +1,14 @@
+.todo-list-details-page__error {
+	color: var(--mat-sys-error);
+}
+
+// Hidden for the first moments, so a fast response doesn't flash the bar for a single frame
+.todo-list-details-page__progress {
+	animation: todo-list-details-page-delay-progress 0s 300ms backwards;
+}
+
+@keyframes todo-list-details-page-delay-progress {
+	from {
+		visibility: hidden;
+	}
+}

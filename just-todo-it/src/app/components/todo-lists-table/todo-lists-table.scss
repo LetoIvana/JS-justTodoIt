@@ -1,0 +1,65 @@
+@use '@angular/material' as mat;
+
+:host {
+	display: block;
+}
+
+.todo-lists-table__filter {
+	width: 100%;
+	max-width: 280px;
+}
+
+.todo-lists-table__error {
+	color: var(--mat-sys-error);
+}
+
+.todo-lists-table__card {
+	// The table and paginator sit on the card's surface instead of their own
+	@include mat.table-overrides(
+		(
+			background-color: transparent,
+		)
+	);
+	@include mat.paginator-overrides(
+		(
+			container-background-color: transparent,
+		)
+	);
+
+	margin-top: 24px;
+	overflow: hidden;
+}
+
+// Reserves the bar's height so the table doesn't jump while loading
+.todo-lists-table__progress {
+	height: 4px;
+
+	// Hidden for the first moments, so a fast response doesn't flash the bar for a single frame
+	mat-progress-bar {
+		animation: todo-lists-table-delay-progress 0s 300ms backwards;
+	}
+}
+
+@keyframes todo-lists-table-delay-progress {
+	from {
+		visibility: hidden;
+	}
+}
+
+.todo-lists-table__empty {
+	margin: 0;
+	padding: 80px 16px;
+	text-align: center;
+	font: var(--mat-sys-body-large);
+}
+
+.todo-lists-table__actions {
+	width: 1%;
+	white-space: nowrap;
+	text-align: end;
+
+	// The text and icon buttons differ in height, so baseline alignment leaves them offset
+	> * {
+		vertical-align: middle;
+	}
+}

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { MainLayout } from '../../components/main-layout/main-layout';
+import { TodoListsTable } from '../../components/todo-lists-table/todo-lists-table';
 
 @Component({
-	imports: [MainLayout],
+	imports: [TodoListsTable],
 	selector: 'jti-todo-lists-page',
 	templateUrl: './todo-lists-page.html',
 })
