@@ -1,18 +1,18 @@
 @let state = this.state();
 
-@if (state.status === 'loaded') {
-	<h1>{{ state.todoList.title }}</h1>
-} @else {
-	<h1>Todo list details</h1>
+<div class="todo-list-details-page__header">
+	<h1>{{ state.status === 'loaded' ? 'Edit todo list' : 'Todo list details' }}</h1>
+	<a routerLink="/" [queryParams]="tableQueryParams()">Back to todo lists</a>
+</div>
 
-	@if (state.status === 'loading') {
-		<mat-progress-bar class="todo-list-details-page__progress" mode="indeterminate" />
-	} @else if (state.status === 'not-found') {
-		<p class="todo-list-details-page__error" role="alert">
-			Todo list not found. It may have been deleted, or the link is wrong.
-		</p>
-		<a routerLink="/">Back to Todo lists</a>
-	} @else {
-		<p class="todo-list-details-page__error" role="alert">{{ state.message }}</p>
-	}
+@if (initialValue(); as initialValue) {
+	<jti-todo-list-form submitLabel="Save" [initialValue]="initialValue" [submitAction]="save" (saved)="onSaved()" />
+} @else if (state.status === 'loading') {
+	<mat-progress-bar class="todo-list-details-page__progress" mode="indeterminate" />
+} @else if (state.status === 'not-found') {
+	<p class="todo-list-details-page__error" role="alert">
+		Todo list not found. It may have been deleted, or the link is wrong.
+	</p>
+} @else if (state.status === 'error') {
+	<p class="todo-list-details-page__error" role="alert">{{ state.message }}</p>
 }

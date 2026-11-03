@@ -12,3 +12,10 @@
 		visibility: hidden;
 	}
 }
+
+.todo-list-details-page__header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+}

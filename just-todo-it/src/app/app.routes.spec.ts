@@ -52,7 +52,7 @@ describe('routes', () => {
 		await harness.fixture.whenStable();
 
 		expect(TestBed.inject(Router).url).toBe(`/${todoListUuid}`);
-		expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('Groceries');
+		expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('Edit todo list');
 	});
 
 	it('opens the create page for a logged-in user', async () => {
