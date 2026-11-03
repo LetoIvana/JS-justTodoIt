@@ -1,0 +1,48 @@
+<form class="todo-list-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+	<mat-form-field class="todo-list-form__title">
+		<mat-label>Title</mat-label>
+		<input matInput formControlName="title" />
+		@if (form.controls.title.hasError('required')) {
+			<mat-error>Title is required.</mat-error>
+		}
+	</mat-form-field>
+
+	<ul class="todo-list-form__items" formArrayName="todos">
+		@for (item of form.controls.todos.controls; track item; let index = $index) {
+			<li class="todo-list-form__item" [formGroupName]="index">
+				<mat-checkbox formControlName="done" [aria-label]="'Done: ' + (item.controls.title.value || 'item')" />
+
+				<mat-form-field class="todo-list-form__item-title">
+					<mat-label>Item name</mat-label>
+					<input #itemTitleInput matInput formControlName="title" />
+					@if (item.controls.title.hasError('required')) {
+						<mat-error>Item name is required.</mat-error>
+					}
+				</mat-form-field>
+
+				<button
+					matIconButton
+					type="button"
+					[attr.aria-label]="'Remove ' + (item.controls.title.value || 'item')"
+					[disabled]="isSubmitting()"
+					(click)="removeItem(index)"
+				>
+					<mat-icon>close</mat-icon>
+				</button>
+			</li>
+		}
+	</ul>
+
+	@if (form.controls.todos.touched && form.controls.todos.hasError('noItems')) {
+		<p class="todo-list-form__items-error">Add at least one item.</p>
+	}
+
+	@if (errorMessage(); as message) {
+		<p class="todo-list-form__error" role="alert">{{ message }}</p>
+	}
+
+	<div class="todo-list-form__actions">
+		<button matButton type="button" [disabled]="isSubmitting()" (click)="addItem()">Add item</button>
+		<button matButton="filled" type="submit" [disabled]="isSubmitting()">{{ submitLabel() }}</button>
+	</div>
+</form>

@@ -1,0 +1,40 @@
+.todo-list-form {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.todo-list-form__title {
+	width: 100%;
+}
+
+.todo-list-form__items {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.todo-list-form__item {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+}
+
+.todo-list-form__item-title {
+	flex: 1;
+}
+
+.todo-list-form__items-error,
+.todo-list-form__error {
+	margin: 0;
+	color: var(--mat-sys-error);
+}
+
+.todo-list-form__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}

@@ -7,6 +7,11 @@ const errorMessages: Record<string, string> = {
 	validation_error: 'Some of the entered data is invalid.',
 	activation_token_expired_or_invalid: 'This activation link is invalid or has expired.',
 	password_reset_token_expired_or_invalid: 'This password reset link is invalid or has expired.',
+	todo_list_with_same_title_exists: 'You already have a Todo list with this name.',
+	// Also returned when an item is renamed and its old name reused in the same save, since the API
+	// creates new items before it renames existing ones
+	resource_conflict:
+		'Item names must be unique. If you renamed an item and reused its old name, save the rename first.',
 };
 
 const fallbackMessage = 'Something went wrong. Please try again.';

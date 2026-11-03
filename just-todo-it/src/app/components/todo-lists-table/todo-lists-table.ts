@@ -50,6 +50,7 @@ import {
 	TodoListsQuery,
 	TodoListsService,
 } from '../../services/todo-lists.service';
+import { TodoListsTableStateService } from '../../services/todo-lists-table-state.service';
 import { getApiErrorMessage } from '../../utils/get-api-error-message';
 import { ConfirmDialog, ConfirmDialogData } from '../confirm-dialog/confirm-dialog';
 import { isCanonicalQuery, isSameQuery, parseQuery, toQueryParams } from './todo-lists-query';
@@ -105,6 +106,7 @@ export class TodoListsTable {
 	private readonly todoListsService = inject(TodoListsService);
 	private readonly dialog = inject(MatDialog);
 	private readonly snackBar = inject(MatSnackBar);
+	private readonly tableState = inject(TodoListsTableStateService);
 
 	private readonly query$ = this.route.queryParamMap.pipe(map(parseQuery), distinctUntilChanged(isSameQuery));
 	private readonly refresh$ = new Subject<void>();
@@ -125,6 +127,8 @@ export class TodoListsTable {
 	);
 
 	constructor() {
+		this.query$.pipe(takeUntilDestroyed()).subscribe((query) => this.tableState.queryParams.set(toQueryParams(query)));
+
 		this.filterControl.valueChanges
 			.pipe(
 				debounceTime(FILTER_DEBOUNCE_MS),

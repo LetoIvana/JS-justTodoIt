@@ -47,12 +47,21 @@ describe('routes', () => {
 
 		const harness = await RouterTestingHarness.create(`/${todoListUuid}`);
 		TestBed.inject(HttpTestingController)
-			.expectOne(`${environment.apiUrl}/todo-lists/${todoListUuid}`)
+			.expectOne(`${environment.apiUrl}/todo-lists/${todoListUuid}?relations=todos`)
 			.flush({ uuid: todoListUuid, title: 'Groceries', created: '2026-01-01T00:00:00.000Z' });
 		await harness.fixture.whenStable();
 
 		expect(TestBed.inject(Router).url).toBe(`/${todoListUuid}`);
-		expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('Groceries');
+		expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('Edit todo list');
+	});
+
+	it('opens the create page for a logged-in user', async () => {
+		user.set({ uuid: '1', email: 'john@example.com' });
+
+		const harness = await RouterTestingHarness.create('/create');
+
+		expect(TestBed.inject(Router).url).toBe('/create');
+		expect(harness.routeNativeElement?.querySelector('jti-create-todo-list-page')).not.toBeNull();
 	});
 
 	it('sends a logged-out user from a Todo list details page to the login page', async () => {

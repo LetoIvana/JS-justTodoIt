@@ -5,6 +5,19 @@
 			Just Todo It
 		</a>
 
+		@if (user()) {
+			<a
+				class="header__link"
+				routerLink="/"
+				routerLinkActive="header__link--active"
+				[queryParams]="tableQueryParams()"
+				[routerLinkActiveOptions]="todoListsActiveOptions"
+			>
+				Todo lists
+			</a>
+			<a class="header__link" routerLink="/create" routerLinkActive="header__link--active">Create a new list</a>
+		}
+
 		<span class="header__spacer"></span>
 
 		@if (user(); as user) {

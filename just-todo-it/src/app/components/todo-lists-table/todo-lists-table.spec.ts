@@ -6,6 +6,8 @@ import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { environment } from '../../../environments/environment';
 import { TodoList } from '../../models/todo-list';
+import { TodoListsTableStateService } from '../../services/todo-lists-table-state.service';
+import { toQueryParams } from './todo-lists-query';
 import { TodoListsTable } from './todo-lists-table';
 
 describe('TodoListsTable', () => {
@@ -173,6 +175,16 @@ describe('TodoListsTable', () => {
 		});
 		expect(filterInput().value).toBe('shop');
 		expect(element().querySelector('mat-expansion-panel')?.classList).toContain('mat-expanded');
+	});
+
+	it('remembers its query params for links back to it', async () => {
+		await open('/?page=2&sortBy=title');
+		flushList(expectListRequest(), createTodoLists(5), 7);
+		await stable();
+
+		expect(TestBed.inject(TodoListsTableStateService).queryParams()).toEqual(
+			toQueryParams({ page: 2, sortBy: 'title', sortDirection: 'desc', title: '' })
+		);
 	});
 
 	it('keeps the filters collapsed when the URL has no filter', async () => {
