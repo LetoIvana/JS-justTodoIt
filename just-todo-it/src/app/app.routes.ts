@@ -28,6 +28,11 @@ export const routes: Routes = [
 				loadComponent: () => import('./pages/todo-lists/todo-lists-page').then((m) => m.TodoListsPage),
 			},
 			{
+				path: 'create',
+				title: 'Create Todo list | Just Todo It',
+				loadComponent: () => import('./pages/create-todo-list/create-todo-list-page').then((m) => m.CreateTodoListPage),
+			},
+			{
 				matcher: todoListUuidMatcher,
 				title: 'Todo list details | Just Todo It',
 				loadComponent: () =>

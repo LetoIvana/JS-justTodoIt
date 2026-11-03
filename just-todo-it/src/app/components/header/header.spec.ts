@@ -61,6 +61,14 @@ describe('Header', () => {
 		expect(element.querySelector('[aria-label="Open user menu"]')).not.toBeNull();
 	});
 
+	it('shows the create link only when logged in', async () => {
+		expect(element.querySelector('a[href="/create"]')).toBeNull();
+
+		await logIn();
+
+		expect(element.querySelector('a[href="/create"]')?.textContent).toContain('Create a new list');
+	});
+
 	it('logs out from the menu and navigates to the login page', async () => {
 		const navigateSpy = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
 		await logIn();

@@ -55,6 +55,15 @@ describe('routes', () => {
 		expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('Groceries');
 	});
 
+	it('opens the create page for a logged-in user', async () => {
+		user.set({ uuid: '1', email: 'john@example.com' });
+
+		const harness = await RouterTestingHarness.create('/create');
+
+		expect(TestBed.inject(Router).url).toBe('/create');
+		expect(harness.routeNativeElement?.querySelector('jti-create-todo-list-page')).not.toBeNull();
+	});
+
 	it('sends a logged-out user from a Todo list details page to the login page', async () => {
 		user.set(null);
 
